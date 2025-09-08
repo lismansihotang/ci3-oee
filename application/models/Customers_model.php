@@ -9,6 +9,10 @@ class Customers_model extends MY_Model
     // Tentukan kolom mana saja yang bisa dicari
     protected $searchable_columns = ['kd_cust', 'nm_cust', 'kota', 'telepon'];
 
+    /**
+     * List Data Customers untuk select.
+     * @return object|null Objek data produk jika ditemukan, atau null jika tidak.
+     */
     public function get_all_for_select()
     {
         $this->db->select('kd_cust, nm_cust');
@@ -21,9 +25,9 @@ class Customers_model extends MY_Model
     }
 
     /**
-     * Mengambil satu produk berdasarkan kode produk.
-     * @param string $product_code Kode produk yang dicari.
-     * @return object|null Objek data produk jika ditemukan, atau null jika tidak.
+     * Mengambil satu customer berdasarkan kode customer.
+     * @param string $code Kode customer yang dicari.
+     * @return object|null Objek data customer jika ditemukan, atau null jika tidak.
      */
     public function get_by_code($code)
     {

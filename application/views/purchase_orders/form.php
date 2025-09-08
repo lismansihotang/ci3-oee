@@ -9,23 +9,23 @@
         'data-fetch-url' => site_url('customers/get_customer_data/'),
         'data-source-key' => 'nm_cust'
     ]); ?>
-        <?= bs_floating_input('nm_cust', 'text', (isset($row) ? $row->nm_cust : '')); ?>
         <?= bs_floating_input('ket', 'text', (isset($row) ? $row->ket : '')); ?>
-        
+        <input type="hidden" name="nm_cust">
         <hr>
 
         <h5 class="mt-4 mb-3">Detail Purchase Order</h5>
 
         <?php
 
-            $headers = ['Kode Produk', 'Nama Produk', 'Jumlah', 'Harga', 'Subtotal', 'Tanggal Kirim'];
+            $headers = ['Kode Produk','Jumlah', 'Harga', 'Subtotal', 'Tanggal Kirim'];
 $columns = ['kd_product', 'nm_product', 'qty', 'harga', 'subtotal', 'kiriman_akhir'];
 
 $column_types = [
     'qty' => 'number',
     'harga' => 'number',
     'subtotal' => 'number',
-    'kiriman_akhir' => 'date'
+    'kiriman_akhir' => 'date',
+    'nm_product' => 'hidden'
 ];
 
 $select_options = [

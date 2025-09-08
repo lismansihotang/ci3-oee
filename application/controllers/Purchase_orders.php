@@ -48,6 +48,14 @@ class Purchase_orders extends MY_Controller
     public function edit($id)
     {
         $this->setTitle('Edit Purchase Order');
+        $data['cust_options'] = [];
+        $customers = $this->Customers_model->get_all_for_select();
+
+        foreach ($customers as $cust) {
+            if (!empty($cust->kd_cust)) {
+                $data['cust_options'][$cust->kd_cust] = $cust->nm_cust;
+            }
+        }
         $products = $this->Products_model->get_all_for_select();
         $data['products_options'] = [];
         foreach ($products as $product) {

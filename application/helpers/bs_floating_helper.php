@@ -1,4 +1,5 @@
 <?php
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
@@ -9,17 +10,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * @param string|null $value Nilai default untuk input.
  * @param string|null $placeholder Teks placeholder untuk input.
  * @param string|null $id ID unik untuk input.
+ * @param array $extra_attributes Array asosiatif berisi atribut tambahan seperti ['data-coreui-datepicker' => 'true'].
  * @return string Kode HTML untuk input form.
  */
 if (! function_exists('bs_floating_input')) {
-    function bs_floating_input($name, $type = 'text', $value = null, $placeholder = null, $id = null)
+    function bs_floating_input($name, $type = 'text', $value = null, $placeholder = null, $id = null, $extra_attributes = [])
     {
-        $id = $id ?? $name . '-' . time();
-        $placeholder = $placeholder ?? "Entry Data " . ucfirst($name);
+        $id = $id ?? $name . '_' . uniqid();
+        $placeholder = $placeholder ?? "Entry Data " . ucfirst(str_replace('_', ' ', $name));
+
+        $attr_string = '';
+        foreach ($extra_attributes as $key => $val) {
+            $attr_string .= " " . html_escape($key) . "=\"" . html_escape($val) . "\"";
+        }
+
+        $class_string = 'class="form-control';
+        if ($type === 'date') {
+            $class_string .= ' flatpickr-input';
+        }
+        $class_string .= '"';
+
+        // Tangani nilai null atau string kosong dengan hati-hati
+        $input_value = ($value !== null && $value !== '') ? html_escape($value) : '';
 
         $html = '<div class="form-floating mb-2">';
-        $html .= '<input type="' . $type . '" class="form-control" id="' . $id . '" name="' . $name . '" placeholder="' . strtoupper($placeholder)  . '" value="' . html_escape($value ?? '') . '">';
-        $html .= '<label for="' . $id . '">' . strtoupper($name) . '</label>';
+        $html .= '<input type="' . html_escape($type) . '" ' . $class_string . ' id="' . html_escape($id) . '" name="' . html_escape($name) . '" placeholder="' . html_escape($placeholder)  . '" value="' . $input_value . '"' . $attr_string . '>';
+        $html .= '<label for="' . html_escape($id) . '">' . html_escape(strtoupper(str_replace('_', ' ', $name))) . '</label>';
         $html .= '</div>';
 
         return $html;
@@ -39,13 +55,13 @@ if (! function_exists('bs_floating_input')) {
 if (! function_exists('bs_floating_textarea')) {
     function bs_floating_textarea($name, $value = null, $placeholder = null, $id = null, $style = null)
     {
-        $id = $id ?? $name . '-' . time();
-        $placeholder = $placeholder ?? "Entry Data " . ucfirst($name);
+        $id = $id ?? $name . '_' . uniqid();
+        $placeholder = $placeholder ?? "Entry Data " . ucfirst(str_replace('_', ' ', $name));
         $style_attr = !empty($style) ? ' style="' . $style . '"' : '';
 
         $html = '<div class="form-floating mb-2">';
-        $html .= '<textarea class="form-control" id="' . $id . '" name="' . $name . '" placeholder="' . strtoupper($placeholder)  . '"' . $style_attr . '>' . html_escape($value ?? '') . '</textarea>';
-        $html .= '<label for="' . $id . '">' . strtoupper($name) . '</label>';
+        $html .= '<textarea class="form-control" id="' . html_escape($id) . '" name="' . html_escape($name) . '" placeholder="' . html_escape($placeholder)  . '"' . $style_attr . '>' . html_escape($value ?? '') . '</textarea>';
+        $html .= '<label for="' . html_escape($id) . '">' . html_escape(strtoupper(str_replace('_', ' ', $name))) . '</label>';
         $html .= '</div>';
 
         return $html;
@@ -59,15 +75,21 @@ if (! function_exists('bs_floating_textarea')) {
  * @param array $options Array asosiatif berisi value dan label untuk opsi.
  * @param string|null $selected_value Nilai yang akan dipilih secara default.
  * @param string|null $id ID unik untuk select.
+ * @param array $extra_attributes Array asosiatif berisi atribut tambahan seperti ['data-target-input' => 'nm_cust'].
  * @return string Kode HTML untuk select form.
  */
 if (! function_exists('bs_floating_select')) {
-    function bs_floating_select($name, $options = [], $selected_value = null, $id = null)
+    function bs_floating_select($name, $options = [], $selected_value = null, $id = null, $extra_attributes = []) // ADDED $extra_attributes
     {
-        $id = $id ?? $name . '-' . time();
+        $id = $id ?? $name . '_' . uniqid();
+
+        $attr_string = '';
+        foreach ($extra_attributes as $key => $val) {
+            $attr_string .= " " . html_escape($key) . "=\"" . html_escape($val) . "\"";
+        }
 
         $html = '<div class="form-floating mb-2">';
-        $html .= '<select class="form-select" id="' . $id . '" name="' . $name . '" aria-label="Floating label select example">';
+        $html .= '<select class="form-select" id="' . html_escape($id) . '" name="' . html_escape($name) . '" aria-label="Floating label select example"' . $attr_string . '>';
 
         foreach ($options as $value => $label) {
             $selected = ($value == $selected_value) ? ' selected' : '';
@@ -75,7 +97,7 @@ if (! function_exists('bs_floating_select')) {
         }
 
         $html .= '</select>';
-        $html .= '<label for="' . $id . '">' . strtoupper($name) . '</label>';
+        $html .= '<label for="' . html_escape($id) . '">' . html_escape(strtoupper(str_replace('_', ' ', $name))) . '</label>';
         $html .= '</div>';
 
         return $html;
@@ -93,13 +115,10 @@ if (! function_exists('bs_floating_select')) {
 if (! function_exists('bs_floating_datetime')) {
     function bs_floating_datetime($datetime_str, $label, $border_color = 'info')
     {
-        // Ubah string datetime menjadi objek DateTime untuk format yang lebih mudah
         try {
             $dt = new DateTime($datetime_str);
-            // Format datetime menjadi format yang lebih rapi (misalnya: "27 Agustus 2025 21:58")
             $formatted_time = $dt->format('d F Y H:i:s');
         } catch (Exception $e) {
-            // Tangani error jika format tanggal tidak valid
             $formatted_time = 'Invalid Date';
         }
 
@@ -123,13 +142,10 @@ if (! function_exists('bs_floating_datetime')) {
 if (! function_exists('bs_table_datetime')) {
     function bs_table_datetime($datetime_str, $status_label, $main_label)
     {
-        // Ubah string datetime menjadi objek DateTime untuk format yang lebih mudah
         try {
             $dt = new DateTime($datetime_str);
-            // Format datetime menjadi format yang lebih rapi (misalnya: "Jan 1, 2023")
             $formatted_date = $dt->format('M j, Y H:i:s');
         } catch (Exception $e) {
-            // Tangani error jika format tanggal tidak valid
             $formatted_date = 'Invalid Date';
         }
 

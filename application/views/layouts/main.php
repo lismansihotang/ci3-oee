@@ -20,13 +20,7 @@ $url_img = base_url() . 'assets/coreui-template-main/dist';
         <div class="sidebar-brand d-none d-md-flex">
             <h4 class="text-white p-3">My App</h4>
         </div>
-        <ul class="sidebar-nav" data-coreui="navigation" data-simplebar>
-            <li class="nav-item"><a class="nav-link" href="<?php echo site_url('dashboard'); ?>">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link <?= $menu_active('users') ?>" href="<?= site_url('users') ?>">Users</a></li>
-            <li class="nav-item"><a class="nav-link" href="<?php echo site_url('products'); ?>">Products</a></li>
-            <li class="nav-title">Components</li>
-            <li class="nav-item"><a class="nav-link <?= $menu_active('materials') ?>" href="<?= site_url('materials') ?>">Materials</a></li>
-        </ul>
+        <?= generate_menu($menu); ?>
     </div>
 
     <div class="wrapper d-flex flex-column min-vh-100 bg-light">

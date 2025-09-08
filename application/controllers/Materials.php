@@ -10,47 +10,36 @@ class Materials extends MY_Controller
     {
         parent::__construct();
         $this->load->model('Materials_model','model');
-        $this->load->helper(['table', 'pagination', 'card', 'bs_floating']);
+        $this->controller_name = 'materials';
     }
 
-    public function index($page = 0)
+    public function index($view = '')
     {
-        $limit = 10;
-        $total = $this->model->count_all();
-        $rows  = $this->model->get_all($limit, $page);
-        $data['rows'] = $rows;
-        $data['pagination'] = build_pagination(site_url('materials/index'), $total, $limit, 3);
-        $this->render('materials/index', $data);
+        $this->setTitle('Materials');
+        
+        parent::index('materials/index');
     }
 
-    public function create()
+    public function create($id = null, $view = '')
     {
-        if ($this->input->post()) {
-            $this->model->insert($this->input->post());
-            redirect('materials');
-        }
-        $this->render('materials/form');
+        $this->setTitle('Tambah Data Materials');
+        parent::form(null, 'materials/form');
     }
 
-    public function edit($id)
+    public function edit($id, $view = '')
     {
-        if ($this->input->post()) {
-            $this->model->update($id, $this->input->post());
-            redirect('materials');
-        }
-        $data['row'] = $this->model->get($id);
-        $this->render('materials/form', $data);
+        $this->setTitle('Ubah Data Materials');
+        parent::form($id, 'materials/form');
     }
 
-    public function view($id)
+    public function view($id, $view = '')
     {
-        $data['row'] = $this->model->get($id);
-        $this->render('materials/view', $data);
+        $this->setTitle('Detail Materials');
+        parent::view($id, 'materials/view');
     }
 
     public function delete($id)
     {
-        $this->model->delete($id);
-        redirect('materials');
+        parent::delete($id);
     }
 }

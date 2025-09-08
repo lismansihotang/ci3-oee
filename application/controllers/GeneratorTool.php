@@ -76,6 +76,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class {$module}_model extends MY_Model
 {
     protected \$table = '{$table}';
+
+    // Tentukan kolom untuk pencarian
+    protected \$searchable_columns = [];
 }
 ";
     }
@@ -97,48 +100,37 @@ class {$module} extends MY_Controller
     {
         parent::__construct();
         \$this->load->model('{$module}_model','model');
-        \$this->load->helper(['table', 'pagination', 'card', 'bs_floating']);
+        \$this->controller_name = '{$table}';
     }
 
-    public function index(\$page = 0)
+    public function index(\$view = '')
     {
-        \$limit = 10;
-        \$total = \$this->model->count_all();
-        \$rows  = \$this->model->get_all(\$limit, \$page);
-        \$data['rows'] = \$rows;
-        \$data['pagination'] = build_pagination(site_url('{$table}/index'), \$total, \$limit, 3);
-        \$this->render('{$table}/index', \$data);
+        \$this->setTitle('{$module}');
+        
+        parent::index('{$table}/index');
     }
 
-    public function create()
+    public function create(\$id = null, \$view = '')
     {
-        if (\$this->input->post()) {
-            \$this->model->insert(\$this->input->post());
-            redirect('{$table}');
-        }
-        \$this->render('{$table}/form');
+        \$this->setTitle('Tambah Data {$module}');
+        parent::form(null, '{$table}/form');
     }
 
-    public function edit(\$id)
+    public function edit(\$id, \$view = '')
     {
-        if (\$this->input->post()) {
-            \$this->model->update(\$id, \$this->input->post());
-            redirect('{$table}');
-        }
-        \$data['row'] = \$this->model->get(\$id);
-        \$this->render('{$table}/form', \$data);
+        \$this->setTitle('Ubah Data {$module}');
+        parent::form(\$id, '{$table}/form');
     }
 
-    public function view(\$id)
+    public function view(\$id, \$view = '')
     {
-        \$data['row'] = \$this->model->get(\$id);
-        \$this->render('{$table}/view', \$data);
+        \$this->setTitle('Detail {$module}');
+        parent::view(\$id, '{$table}/view');
     }
 
     public function delete(\$id)
     {
-        \$this->model->delete(\$id);
-        redirect('{$table}');
+        parent::delete(\$id);
     }
 }
 ";
@@ -152,16 +144,16 @@ class {$module} extends MY_Controller
         // INDEX
         $headers = [];
         foreach ($fields as $f) {
-            $headers[] = ucfirst($f->name);
+            $headers[strtolower($f->name)] = ucfirst($f->name);
         }
 
         $indexView = "<?= card_open('<i class=\"icon cil-list\"></i> List of {$module}') ?>
-    <div class=\"mb-3\">
-        <div class=\"btn-group\" role=\"group\" aria-label=\"HomeAdd\">
-            <a href=\"<?= site_url('{$table}/create') ?>\" class=\"btn btn-primary btn-sm\" data-coreui-placement=\"top\" title=\"Tambah Data Baru\"><i class=\"icon cil-plus\"></i> Tambah Data</a>
-            <a href=\"<?= site_url('/') ?>\" class=\"btn btn-outline-primary btn-sm\" data-coreui-toggle=\"tooltip\" data-coreui-placement=\"top\" title=\"< Kembali ke Halaman Utama\"><i class=\"icon cil-home\"></i></a>
-        </div>
-    </div>
+    <?= build_index_header('{$table}', [
+        'search_term' => \$search_term,
+        'total_rows' => \$total_rows,
+        'from_rows' => \$from_rows,
+        'to_rows' => \$to_rows,
+    ]) ?>
     <?= build_table([
         'headers' => " . var_export($headers, true) . ",
         'rows' => \$rows,
@@ -170,7 +162,7 @@ class {$module} extends MY_Controller
             'edit' => '{$table}/edit',
             'delete' => '{$table}/delete'
         ]
-    ]) ?>
+    ],\$offset) ?>
     <?= \$pagination ?>
 <?= card_close() ?>";
 

@@ -2,23 +2,41 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
- * Helper untuk membuat tabel bootstrap otomatis
- * 
- * Contoh:
- * echo build_table([
- *   'headers' => ['ID', 'Nama', 'Email'],
- *   'rows'    => $users,
- *   'actions' => [
- *       'view'   => 'users/view',
- *       'edit'   => 'users/edit',
- *       'delete' => 'users/delete',
- *   ]
- * ]);
+ * Helper untuk membuat tabel bootstrap otomatis.
+ *
+ * @param array $params Parameter untuk konfigurasi tabel.
+ * @param int   $offset Nilai offset untuk memulai counter.
+ *
+ * Contoh penggunaan dengan alias:
+ * $params = [
+ * 'headers' => [
+ * 'id' => 'ID',
+ * 'nama_produk' => 'Nama Produk',
+ * 'berat_std' => 'Berat Standar',
+ * ],
+ * 'rows'    => $products, // Ini adalah data dari database
+ * 'actions' => [
+ * 'view'   => 'products/view',
+ * 'edit'   => 'products/edit',
+ * 'delete' => 'products/delete',
+ * ]
+ * ];
+ * echo build_table($params, $offset);
  */
 if (!function_exists('build_table')) {
-    function build_table($params = [])
+    function build_table($params = [], $offset = 0)
     {
+        // Pastikan headers adalah array asosiatif,
+        // jika tidak, ubah formatnya.
         $headers = $params['headers'] ?? [];
+        if (!empty($headers) && is_int(key($headers))) {
+            $formatted_headers = [];
+            foreach ($headers as $h) {
+                $formatted_headers[str_replace(' ', '_', strtolower($h))] = $h;
+            }
+            $headers = $formatted_headers;
+        }
+
         $rows    = $params['rows'] ?? [];
         $actions = $params['actions'] ?? [];
 
@@ -29,8 +47,8 @@ if (!function_exists('build_table')) {
 
         // headers
         $html .= '<th class="bg-body-secondary text-center">#</th>';
-        foreach ($headers as $h) {
-            $html .= '<th class="bg-body-secondary">' . htmlspecialchars($h) . '</th>';
+        foreach ($headers as $alias) {
+            $html .= '<th class="bg-body-secondary">' . htmlspecialchars($alias) . '</th>';
         }
         if (!empty($actions)) {
             $html .= '<th class="bg-body-secondary text-center">Aksi</th>';
@@ -39,13 +57,14 @@ if (!function_exists('build_table')) {
 
         // isi data
         if (!empty($rows)) {
-            $counter = 1;
+            $counter = $offset + 1;
             foreach ($rows as $r) {
                 $html .= '<tr class="text-center">';
                 $html .= '<td>' . htmlspecialchars($counter) . '</td>';
-                foreach ($headers as $h) {
-                    $field = strtolower($h);
-                    $value = isset($r->$field) ? $r->$field : '';
+
+                // Gunakan key dari array headers sebagai nama field
+                foreach ($headers as $field_name => $alias) {
+                    $value = isset($field_name) ? $r->$field_name : '';
                     $html .= '<td>' . htmlspecialchars($value) . '</td>';
                 }
 

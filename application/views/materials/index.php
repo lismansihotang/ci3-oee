@@ -1,34 +1,34 @@
 <?= card_open('<i class="icon cil-list"></i> List of Materials') ?>
-<div class="mb-3">
-    <div class="btn-group" role="group" aria-label="HomeAdd">
-        <a href="<?= site_url('materials/create') ?>" class="btn btn-primary btn-sm" data-coreui-placement="top" title="Tambah Data Baru"><i class="icon cil-plus"></i> Tambah Data</a>
-        <a href="<?= site_url('/') ?>" class="btn btn-outline-primary btn-sm" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke Halaman Utama"><i class="icon cil-home"></i></a>
-    </div>
-</div>
-<?= build_table([
-    'headers' => array(
-        //0 => 'Id',
-        1 => 'Kode',
-        2 => 'Nama',
-        3 => 'Qty',
-        4 => 'Jenis',
-        /**5 => 'Lokasi_1',
-        6 => 'Lokasi_2',
-        7 => 'Keterangan',
-        8 => 'Is_deleted',
-        9 => 'Created_by',
-        10 => 'Updated_by',
-        11 => 'Deleted_by',
-        12 => 'Created_at',
-        13 => 'Updated_at',
-        14 => 'Deleted_at',**/
-    ),
-    'rows' => $rows,
-    'actions' => [
-        'view' => 'materials/view',
-        'edit' => 'materials/edit',
-        'delete' => 'materials/delete'
-    ]
-]) ?>
-<?= $pagination ?>
+    <?= build_index_header('materials', [
+        'search_term' => $search_term,
+        'total_rows' => $total_rows,
+        'from_rows' => $from_rows,
+        'to_rows' => $to_rows,
+    ]) ?>
+    <?= build_table([
+        'headers' => array (
+  'id' => 'Id',
+  'kode' => 'Kode',
+  'nama' => 'Nama',
+  'qty' => 'Qty',
+  'jenis' => 'Jenis',
+  'lokasi_1' => 'Lokasi_1',
+  'lokasi_2' => 'Lokasi_2',
+  'keterangan' => 'Keterangan',
+  'is_deleted' => 'Is_deleted',
+  'created_by' => 'Created_by',
+  'updated_by' => 'Updated_by',
+  'deleted_by' => 'Deleted_by',
+  'created_at' => 'Created_at',
+  'updated_at' => 'Updated_at',
+  'deleted_at' => 'Deleted_at',
+),
+        'rows' => $rows,
+        'actions' => [
+            'view' => 'materials/view',
+            'edit' => 'materials/edit',
+            'delete' => 'materials/delete'
+        ]
+    ],$offset) ?>
+    <?= $pagination ?>
 <?= card_close() ?>

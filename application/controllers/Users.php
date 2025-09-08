@@ -10,47 +10,36 @@ class Users extends MY_Controller
     {
         parent::__construct();
         $this->load->model('Users_model','model');
-        $this->load->helper(['table', 'pagination', 'card', 'bs_floating']);
+        $this->controller_name = 'users';
     }
 
-    public function index($page = 0)
+    public function index($view = '')
     {
-        $limit = 10;
-        $total = $this->model->count_all();
-        $rows  = $this->model->get_all($limit, $page);
-        $data['rows'] = $rows;
-        $data['pagination'] = build_pagination(site_url('users/index'), $total, $limit, 3);
-        $this->render('users/index', $data);
+        $this->setTitle('Users');
+        
+        parent::index('users/index');
     }
 
-    public function create()
+    public function create($id = null, $view = '')
     {
-        if ($this->input->post()) {
-            $this->model->insert($this->input->post());
-            redirect('users');
-        }
-        $this->render('users/form');
+        $this->setTitle('Tambah Data Users');
+        parent::form(null, 'users/form');
     }
 
-    public function edit($id)
+    public function edit($id, $view = '')
     {
-        if ($this->input->post()) {
-            $this->model->update($id, $this->input->post());
-            redirect('users');
-        }
-        $data['row'] = $this->model->get($id);
-        $this->render('users/form', $data);
+        $this->setTitle('Ubah Data Users');
+        parent::form($id, 'users/form');
     }
 
-    public function view($id)
+    public function view($id, $view = '')
     {
-        $data['row'] = $this->model->get($id);
-        $this->render('users/view', $data);
+        $this->setTitle('Detail Users');
+        parent::view($id, 'users/view');
     }
 
     public function delete($id)
     {
-        $this->model->delete($id);
-        redirect('users');
+        parent::delete($id);
     }
 }

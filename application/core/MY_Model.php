@@ -1,128 +1,201 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+/**
+ * Class MY_Model
+ * @property CI_DB_query_builder $db
+ * @property CI_DB_driver $db
+ * @property CI_DB_forge $dbforge
+ * @property CI_DB_utility $dbutil
+ * @property CI_Session $session
+ */
 class MY_Model extends CI_Model
 {
-    // Nama tabel akan didefinisikan di model turunan
     protected $table = '';
+    protected $searchable_columns = [];
+    protected $detail_table = '';
+    protected $foreign_key = '';
 
-    /**
-     * Mengambil semua data dari tabel dengan limit dan offset.
-     *
-     * @param int $limit  Jumlah data yang akan diambil.
-     * @param int $offset Data yang akan dilewati.
-     * @return array
-     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->database();
+        $this->load->library('session');
+    }
+
+    protected function _build_search_query($search_term)
+    {
+        if (!empty($search_term) && !empty($this->searchable_columns)) {
+            $search_term = strtolower($search_term);
+            $this->db->group_start();
+            foreach ($this->searchable_columns as $column) {
+                $this->db->or_like("LOWER({$column})", $search_term, 'both');
+            }
+            $this->db->group_end();
+        }
+    }
+
+    private function _add_is_deleted_filter()
+    {
+        if ($this->db->field_exists('is_deleted', $this->table)) {
+            $this->db->where($this->table . '.is_deleted', 0);
+        }
+    }
+
     public function get_all($limit = 10, $offset = 0)
     {
-        // Pastikan nama tabel tidak kosong
         if (empty($this->table)) {
             return [];
         }
-
+        $this->_add_is_deleted_filter();
         return $this->db->order_by('id', 'asc')->get($this->table, $limit, $offset)->result();
     }
 
-    /**
-     * Menghitung total data di tabel.
-     *
-     * @return int
-     */
+    public function get_filtered($limit = 10, $offset = 0, $search_term = '')
+    {
+        if (empty($this->table)) {
+            return [];
+        }
+        $this->_add_is_deleted_filter();
+        $this->_build_search_query($search_term);
+        return $this->db->order_by('id', 'asc')->get($this->table, $limit, $offset)->result();
+    }
+
     public function count_all()
     {
         if (empty($this->table)) {
             return 0;
         }
-
-        return $this->db->count_all($this->table);
+        $this->_add_is_deleted_filter();
+        return $this->db->count_all_results($this->table);
     }
 
-    /**
-     * Mengambil satu baris data berdasarkan ID.
-     *
-     * @param int $id ID data yang akan diambil.
-     * @return object|null
-     */
+    public function count_filtered($search_term = '')
+    {
+        if (empty($this->table)) {
+            return 0;
+        }
+        $this->_add_is_deleted_filter();
+        $this->_build_search_query($search_term);
+        $this->db->from($this->table);
+        return $this->db->count_all_results();
+    }
+
     public function get($id)
     {
         if (empty($this->table) || !is_numeric($id)) {
             return null;
         }
-
+        $this->_add_is_deleted_filter();
         return $this->db->get_where($this->table, ['id' => $id])->row();
     }
 
-    /**
-     * Menyimpan data baru ke tabel.
-     *
-     * @param array $data Data yang akan disimpan.
-     * @return bool
-     */
     public function insert($data)
     {
         if (empty($this->table) || empty($data)) {
             return false;
         }
-
-        // Tambahkan data log jika session tersedia
-        if (isset($CI->session) && $CI->session->userdata('user_id')) {
-            $data['created_by'] = $CI->session->userdata('user_id');
+        if ($this->session->userdata('user_id')) {
+            $data['created_by'] = $this->session->userdata('user_id');
         }
-
         return $this->db->insert($this->table, $data);
     }
 
-    /**
-     * Memperbarui data berdasarkan ID.
-     *
-     * @param int $id ID data yang akan diperbarui.
-     * @param array $data Data baru.
-     * @return bool
-     */
     public function update($id, $data)
     {
         if (empty($this->table) || !is_numeric($id) || empty($data)) {
             return false;
         }
-
-        // Ambil CI instance untuk mengakses session
-        $CI = &get_instance();
-
-        // Tambahkan data log jika session tersedia
-        if (isset($CI->session) && $CI->session->userdata('user_id')) {
-            $data['updated_by'] = $CI->session->userdata('user_id');
+        if ($this->session->userdata('user_id')) {
+            $data['updated_by'] = $this->session->userdata('user_id');
             $data['updated_at'] = date('Y-m-d H:i:s');
         }
-
         return $this->db->where('id', $id)->update($this->table, $data);
     }
 
-    /**
-     * Menghapus data secara "soft delete" dengan mengubah status.
-     *
-     * @param int $id ID data yang akan dihapus.
-     * @return bool
-     */
     public function delete($id)
     {
         if (empty($this->table) || !is_numeric($id)) {
             return false;
         }
+        if ($this->db->field_exists('is_deleted', $this->table)) {
+            $data = ['is_deleted' => 1];
+            if ($this->session->userdata('user_id')) {
+                $data['deleted_by'] = $this->session->userdata('user_id');
+                $data['deleted_at'] = date('Y-m-d H:i:s');
+            }
+            return $this->db->where('id', $id)->update($this->table, $data);
+        } else {
+            return $this->db->delete($this->table, ['id' => $id]);
+        }
+    }
 
-        $data = ['is_deleted' => 1];
-
-        // Ambil CI instance untuk mengakses session
-        $CI = &get_instance();
-
-        // set status delete
-        $data['is_deleted'] = 1;
-
-        // Tambahkan data log jika session tersedia
-        if (isset($CI->session) && $CI->session->userdata('user_id')) {
-            $data['deleted_by'] = $CI->session->userdata('user_id');
-            $data['deleted_at'] = date('Y-m-d H:i:s');
+    public function insert_with_details($header_data, $details_data)
+    {
+        if (empty($this->table) || empty($this->detail_table)) {
+            return false;
         }
 
-        return $this->db->where('id', $id)->update($this->table, $data);
+        $this->db->trans_begin();
+
+        // 1. Insert data header
+        $this->insert($header_data);
+        // Pastikan Anda memanggil insert_id() pada objek database
+        /** @var CI_DB_driver $db */
+        $id = @$this->db->insert_id(); // <--- Ini yang benar
+
+        // 2. Insert data detail
+        if ($id && !empty($details_data)) {
+            foreach ($details_data as &$row) {
+                $row[$this->foreign_key] = $id;
+                $row['created_by'] = $this->session->userdata('user_id');
+            }
+            $this->db->insert_batch($this->detail_table, $details_data);
+        }
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return false;
+        } else {
+            $this->db->trans_commit();
+            return true;
+        }
+    }
+
+    public function update_with_details($id, $header_data, $details_data)
+    {
+        if (empty($this->table) || empty($this->detail_table) || !is_numeric($id)) {
+            return false;
+        }
+        $this->db->trans_begin();
+        $this->update($id, $header_data);
+        $this->db->where($this->foreign_key, $id)->update($this->detail_table, ['is_deleted' => 1]);
+        if (!empty($details_data)) {
+            foreach ($details_data as &$row) {
+                $row[$this->foreign_key] = $id;
+                $row['updated_by'] = $this->session->userdata('user_id');
+                $row['updated_at'] = date('Y-m-d H:i:s');
+            }
+            $this->db->insert_batch($this->detail_table, $details_data);
+        }
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return false;
+        } else {
+            $this->db->trans_commit();
+            return true;
+        }
+    }
+
+    public function get_details($foreign_id)
+    {
+        if (empty($this->detail_table) || empty($this->foreign_key) || !is_numeric($foreign_id)) {
+            return [];
+        }
+        $this->db->where($this->foreign_key, $foreign_id);
+        if ($this->db->field_exists('is_deleted', $this->detail_table)) {
+            $this->db->where('is_deleted', 0);
+        }
+        return $this->db->get($this->detail_table)->result();
     }
 }

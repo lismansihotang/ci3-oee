@@ -5,7 +5,7 @@ require_once APPPATH . 'core/Auth_Controller.php';
 
 class Dashboard extends Auth_Controller
 {
-    public function index()
+    public function index($view = '')
     {
         $this->setTitle('Dashboard');
         $this->render('dashboard/index');

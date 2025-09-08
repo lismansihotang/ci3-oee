@@ -1,4 +1,5 @@
 <?php
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 if (!function_exists('indo_date')) {
@@ -6,13 +7,17 @@ if (!function_exists('indo_date')) {
      * Mengubah format waktu menjadi tanggal Indonesia.
      *
      * @param string $datetime Waktu dalam format YYYY-MM-DD HH:MM:SS.
-     * @return string Tanggal dalam format DD Bulan YYYY.
+     * @param bool $show_time Menampilkan waktu jika true.
+     * @return string Tanggal atau tanggal dan waktu dalam format Indonesia.
      */
-    function indo_date($datetime)
+    function indo_date($datetime, $show_time = false)
     {
-        if (empty($datetime)) {
+        if (empty($datetime) || $datetime === '0000-00-00 00:00:00' || $datetime === '0000-00-00') {
             return '';
         }
+
+        // Handle timestamps with microseconds by removing them
+        $datetime_cleaned = explode('.', $datetime)[0];
 
         $nama_bulan = [
             '01' => 'Januari',
@@ -29,12 +34,19 @@ if (!function_exists('indo_date')) {
             '12' => 'Desember',
         ];
 
-        // Pisahkan tanggal dari string datetime
-        $date = substr($datetime, 0, 10);
-        $tanggal = substr($date, 8, 2);
-        $bulan = substr($date, 5, 2);
-        $tahun = substr($date, 0, 4);
+        $timestamp = strtotime($datetime_cleaned);
 
-        return $tanggal . ' ' . $nama_bulan[$bulan] . ' ' . $tahun;
+        $tanggal = date('d', $timestamp);
+        $bulan = date('m', $timestamp);
+        $tahun = date('Y', $timestamp);
+
+        $formatted_date = $tanggal . ' ' . $nama_bulan[$bulan] . ' ' . $tahun;
+
+        if ($show_time) {
+            $jam = date('H:i', $timestamp);
+            return $formatted_date . ' - ' . $jam . ' WIB';
+        }
+
+        return $formatted_date;
     }
 }

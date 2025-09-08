@@ -45,8 +45,12 @@ class Purchase_orders extends MY_Controller
         $this->form_with_details(null, 'purchase_orders/form', $data);
     }
 
-    public function edit($id)
+    public function edit($id = null)
     {
+        if ($id === null || !is_numeric($id)) {
+            redirect('purchase_orders/index');
+        }
+
         $this->setTitle('Edit Purchase Order');
         $data['cust_options'] = [];
         $customers = $this->Customers_model->get_all_for_select();
@@ -66,8 +70,12 @@ class Purchase_orders extends MY_Controller
         $this->form_with_details($id, 'purchase_orders/form', $data);
     }
 
-    public function view($id, $view = '')
+    public function view($id = null, $view = '')
     {
+        if ($id === null || !is_numeric($id)) {
+            redirect('purchase_orders/index');
+        }
+
         $this->setTitle('Detail Purchase Order');
         parent::view($id, 'purchase_orders/view');
     }

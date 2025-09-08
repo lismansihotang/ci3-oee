@@ -27,7 +27,10 @@ class MY_Controller extends CI_Controller
             'table',
             'card',
             'bs_floating',
-            'table_form_detail_generic'
+            'table_form_detail_generic',
+            'detail_table',
+            'html',
+            'date'
         ]);
         $this->load->library(['session']);
 
@@ -37,6 +40,10 @@ class MY_Controller extends CI_Controller
                 'label' => 'Dashboard',
                 'url' => 'dashboard',
                 'type' => 'link'
+            ],
+            [
+                'label' => 'Manufacturing',
+                'type' => 'nav-title'
             ],
             [
                 'label' => 'Purchase Orders',
@@ -157,9 +164,17 @@ class MY_Controller extends CI_Controller
             }
 
             if ($result) {
+                $this->session->set_flashdata('swal_flash', json_encode([
+                    'status' => 'success',
+                    'message' => 'Data berhasil disimpan!'
+                ]));
+
                 redirect($this->controller_name);
             } else {
-                $this->session->set_flashdata('error', 'Gagal menyimpan data.');
+                $this->session->set_flashdata('swal_flash', json_encode([
+                    'status' => 'error',
+                    'message' => 'Data gagal disimpan!'
+                ]));
                 redirect(current_url());
             }
         }
@@ -222,9 +237,28 @@ class MY_Controller extends CI_Controller
         $this->render($view, $data);
     }
 
+    public function view_by_code($code, $view = '')
+    {
+        $data['row'] = $this->model->get_by_code($code);
+        if (!$data['row']) {
+            show_404();
+        }
+        $this->render($view, $data);
+    }
+
     public function delete($id)
     {
-        $this->model->delete($id);
+        if ($this->model->delete($id)) {
+            $this->session->set_flashdata('swal_flash', json_encode([
+                    'status' => 'success',
+                    'message' => 'Data berhasil dihapus!'
+                ]));
+        } else {
+            $this->session->set_flashdata('swal_flash', json_encode([
+                    'status' => 'error',
+                    'message' => 'Data gagal dihapus!'
+                ]));
+        }
         redirect($this->controller_name);
     }
 }

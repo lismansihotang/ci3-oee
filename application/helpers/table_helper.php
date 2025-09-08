@@ -1,4 +1,5 @@
 <?php
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
@@ -78,7 +79,7 @@ if (!function_exists('build_table')) {
                         $html .= '<a href="' . site_url($actions['edit'] . '/' . $r->id) . '" class="btn btn-sm btn-warning" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Edit Data Ini"><i class="icon cil-pencil"></i> Edit</a> ';
                     }
                     if (isset($actions['delete'])) {
-                        $html .= '<a href="' . site_url($actions['delete'] . '/' . $r->id) . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Yakin hapus?\')" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Hapus Data Ini"><i class="icon cil-trash"></i> Delete</a>';
+                        $html .= '<a href="' . site_url($actions['delete'] . '/' . $r->id) . '" class="btn btn-sm btn-danger btn-delete" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Hapus Data Ini"><i class="icon cil-trash"></i> Delete</a>';
                     }
                     $html .= '</td>';
                 }

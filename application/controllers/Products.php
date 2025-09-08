@@ -44,6 +44,12 @@ class Products extends MY_Controller
         parent::delete($id);
     }
 
+    public function view_by_code($code, $view = '')
+    {
+        $this->setTitle('Detail Products');
+        parent::view_by_code($code, 'products/view');
+    }
+
     /**
      * Mengambil data produk berdasarkan kode produk dan mengembalikan JSON.
      * Endpoint ini akan digunakan oleh JavaScript untuk auto-fill.

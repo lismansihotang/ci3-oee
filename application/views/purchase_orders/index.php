@@ -1,4 +1,4 @@
-<?= card_open('<i class="icon cil-list"></i> List of Purchase_orders') ?>
+<?= card_open('<i class="icon cil-list"></i> List of Purchase Orders') ?>
     <?= build_index_header('purchase_orders', [
         'search_term' => $search_term,
         'total_rows' => $total_rows,
@@ -8,11 +8,11 @@
     <?= build_table([
         'headers' => array(
   //'id' => 'Id',
-  'no_po' => 'No_po',
-  'tgl_po' => 'Tgl_po',
-  'tgl_kirim' => 'Tgl_kirim',
-  'kd_cust' => 'Kd_cust',
-  'nm_cust' => 'Nm_cust',
+  'no_po' => 'No. PO',
+  'tgl_po' => 'Tgl. PO',
+  'tgl_kirim' => 'Tgl. Kirim',
+  'kd_cust' => 'Kode Cust',
+  'nm_cust' => 'Nama Cust',
   /**'ket' => 'Ket',
   'is_deleted' => 'Is_deleted',
   'created_by' => 'Created_by',
@@ -31,3 +31,27 @@
     ], $offset) ?>
     <?= $pagination ?>
 <?= card_close() ?>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="<?= base_url('assets/js/sweetalert-helper.js') ?>"></script>
+<script>
+    $(document).ready(function() {
+        // Tangani tombol delete
+        $(document).on('click', '.btn-delete', function(e) {
+            e.preventDefault(); // stop default link
+            const url = $(this).attr('href');
+
+            SwalHelper.confirm(
+                "Apakah Anda yakin ingin menghapus data ini?",
+                function() {
+                    // jika user pilih YA
+                    window.location.href = url; // redirect ke controller delete
+                },
+                function() {
+                    // jika user pilih BATAL, bisa kosong atau console
+                    console.log("User batal hapus");
+                }
+            );
+        });
+    });
+</script>

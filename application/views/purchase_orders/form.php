@@ -1,31 +1,44 @@
 <link rel="stylesheet" href="<?= base_url('assets/node_modules/flatpickr/dist/flatpickr.min.css') ?>">
-<?= card_open(isset($row) ? '<i class="icon cil-window"></i> Edit Purchase_orders' : '<i class="icon cil-window"></i> Tambah Purchase_orders') ?>
-    <form method="post">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="<?= base_url('assets/css/floating-select2.css') ?>">
+
+<?= card_open(isset($row) ? '<i class="icon cil-window"></i> Edit Purchase Orders' : '<i class="icon cil-window"></i> Tambah Purchase Orders') ?>
+    <form method="post" id="form-purchase-orders">
         <?= bs_floating_input('no_po', 'text', (isset($row) ? $row->no_po : '')); ?>
         <?= bs_floating_input('tgl_po', 'date', (isset($row) ? $row->tgl_po : '')); ?>
         <?= bs_floating_input('tgl_kirim', 'date', (isset($row) ? $row->tgl_kirim : '')); ?>
         <?= bs_floating_select('kd_cust', $cust_options, (isset($row) ? $row->kd_cust : ''), null, [ // extra_attributes
         'data-target-input' => 'nm_cust',
+        'data-source-key' => 'nm_cust',
         'data-fetch-url' => site_url('customers/get_customer_data/'),
-        'data-source-key' => 'nm_cust'
+        'class' => 'select2-init select-customer',
     ]); ?>
+    <input type="hidden" name="nm_cust" value="<?=(isset($row) ? $row->nm_cust : '');?>">
         <?= bs_floating_input('ket', 'text', (isset($row) ? $row->ket : '')); ?>
-        <input type="hidden" name="nm_cust">
+        
         <hr>
 
         <h5 class="mt-4 mb-3">Detail Purchase Order</h5>
 
         <?php
 
-            $headers = ['Kode Produk','Jumlah', 'Harga', 'Subtotal', 'Tanggal Kirim'];
-$columns = ['kd_product', 'nm_product', 'qty', 'harga', 'subtotal', 'kiriman_akhir'];
+            $headers = [
+                'Kode Produk','Jumlah', 'Harga', 'Subtotal',
+                //'Tanggal Kirim'
+            ];
+$columns = [
+    'kd_product', 'nm_product', 'qty', 'harga', 'subtotal',
+    //'kiriman_akhir'
+];
 
 $column_types = [
+    'kd_product' => 'select2',
     'qty' => 'number',
     'harga' => 'number',
     'subtotal' => 'number',
-    'kiriman_akhir' => 'date',
-    'nm_product' => 'hidden'
+    //'kiriman_akhir' => 'date',
+    'nm_product' => 'hidden',
 ];
 
 $select_options = [
@@ -40,7 +53,14 @@ $fetch_urls = [
 $column_attributes = [
     'qty' => ['class' => 'qty-input', 'id' => 'qty_0'],
     'harga' => ['class' => 'harga-input'],
-    'kd_product' => ['class' => 'produk-select'],
+    'kd_product' => [
+        'class' => 'produk-select select2-init',
+                    'data-fetch-url' => site_url('products/get_product_data/'),
+                    'data-mapping' => [
+            "nama_produk" => ".nama-produk-input",
+            "cost"        => ".harga-input"
+        ]
+    ],
     'nm_product' => ['class' => 'nama-produk-input'],
     'subtotal' => ['class' => 'subtotal-input'],
 ];
@@ -58,10 +78,33 @@ echo table_form_detail_generic('poDetailTable', $headers, $columns, $details, $c
         </div>
     </form>
 <?= card_close() ?>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script src="<?= base_url('assets/node_modules/flatpickr/dist/flatpickr.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/flatpickr_config.js') ?>"></script>
-<script src="<?= base_url('assets/js/grid-helper.js') ?>"></script>
-<script src="<?= base_url('assets/js/purchase-order-calc.js') ?>"></script>
-<script src="<?= base_url('assets/js/purchase-order-grid-helper.js') ?>"></script>
 <script src="<?= base_url('assets/js/flatpickr-helper.js') ?>"></script>
-<script src="<?= base_url('assets/js/form-autofill-helper.js') ?>"></script>
+
+<script src="<?= base_url('assets/js/fetch.js') ?>"></script>
+<script src="<?= base_url('assets/js/header-autofill.js') ?>"></script>
+<script src="<?= base_url('assets/js/grid-autofill.js') ?>"></script>
+<script src="<?= base_url('assets/js/grid-helper.js') ?>"></script>
+<script src="<?= base_url('assets/js/calc-grid.js') ?>"></script>
+
+<script>
+    $(function () {
+        // init Select2 umum
+        $(".select2-init").select2({ theme: "bootstrap-5" });
+
+        // helper tabel (init plugin)
+        $("#poDetailTable").gridHelper();
+
+        // autofill tabel produk
+        $("#poDetailTable").tableAutofill({ trigger: ".produk-select" });
+
+        // kalkulasi subtotal
+        $("#poDetailTable").calcGrid();
+
+        // header/form pelanggan
+        $("#form-purchase-orders").headerAutofill({ trigger: ".select-customer" });
+    });
+</script>

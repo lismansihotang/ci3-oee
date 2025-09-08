@@ -1,4 +1,5 @@
 <?php
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
@@ -16,7 +17,7 @@ function breadcrumb($custom = null, $divider = '/')
     $url = site_url();
 
     // Home selalu pertama
-    $breadcrumb[] = '<li class="nav-item"><a class="nav-link" href="' . site_url() . '">Home</a></li>';
+    $breadcrumb[] = '<li class="nav-item"><a class="nav-link" href="' . site_url() . '"></i> Home <i class="icon cil-chevron-right"></i></a></li>';
 
     $total = count($segments);
     foreach ($segments as $i => $seg) {
@@ -27,9 +28,9 @@ function breadcrumb($custom = null, $divider = '/')
         $title = $custom[$seg] ?? ucfirst(str_replace('_', ' ', $seg));
 
         if ($isLast) {
-            $breadcrumb[] = '<li class="nav-item active" aria-current="page"><a class="nav-link" href="#">' . $title . '</a></li>';
+            $breadcrumb[] = '<li class="nav-item active" aria-current="page"><a class="nav-link" href="#"><span class="badge bg-primary">' . $title . '</span></a></li>';
         } else {
-            $breadcrumb[] = '<li class="nav-item"><a class="nav-link" href="' . $url . '">' . $title . '</a></li>';
+            $breadcrumb[] = '<li class="nav-item"><a class="nav-link" href="' . $url . '">' . $title . ' <i class="icon cil-chevron-right"></i></a></li>';
         }
     }
 

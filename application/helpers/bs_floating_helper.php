@@ -79,17 +79,25 @@ if (! function_exists('bs_floating_textarea')) {
  * @return string Kode HTML untuk select form.
  */
 if (! function_exists('bs_floating_select')) {
-    function bs_floating_select($name, $options = [], $selected_value = null, $id = null, $extra_attributes = []) // ADDED $extra_attributes
+    function bs_floating_select($name, $options = [], $selected_value = null, $id = null, $extra_attributes = [])
     {
         $id = $id ?? $name . '_' . uniqid();
 
         $attr_string = '';
+        $class_attr = 'class="form-select"'; // Default class
+
+        // Cek apakah ada atribut 'class' di extra_attributes
+        if (isset($extra_attributes['class'])) {
+            $class_attr = 'class="form-select ' . html_escape($extra_attributes['class']) . '"';
+            unset($extra_attributes['class']); // Hapus dari extra_attributes agar tidak digandakan
+        }
+
         foreach ($extra_attributes as $key => $val) {
             $attr_string .= " " . html_escape($key) . "=\"" . html_escape($val) . "\"";
         }
 
         $html = '<div class="form-floating mb-2">';
-        $html .= '<select class="form-select" id="' . html_escape($id) . '" name="' . html_escape($name) . '" aria-label="Floating label select example"' . $attr_string . '>';
+        $html .= '<select ' . $class_attr . ' id="' . html_escape($id) . '" name="' . html_escape($name) . '" aria-label="Floating label select example"' . $attr_string . '>';
 
         foreach ($options as $value => $label) {
             $selected = ($value == $selected_value) ? ' selected' : '';

@@ -7,14 +7,15 @@ $url_img = base_url() . 'assets/coreui-template-main/dist';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title><?= $title ?? 'Dashboard' ?></title>
     <?= load_css() ?>
 </head>
-
-<body>
+<?php
+$swal_flash = $this->session->flashdata('swal_flash');
+?>
+<body data-flash='<?= $swal_flash ?? "" ?>'>
 
     <div class="sidebar sidebar-dark sidebar-fixed" id="sidebar">
         <div class="sidebar-brand d-none d-md-flex">
@@ -66,7 +67,6 @@ $url_img = base_url() . 'assets/coreui-template-main/dist';
             </div>
         </div>
     </div>
-
     <?= load_js() ?>
 </body>
 

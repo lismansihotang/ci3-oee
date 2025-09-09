@@ -48,7 +48,7 @@ class MY_Model extends CI_Model
             return [];
         }
         $this->_add_is_deleted_filter();
-        return $this->db->order_by('id', 'asc')->get($this->table, $limit, $offset)->result();
+        return $this->db->order_by('id', 'desc')->get($this->table, $limit, $offset)->result();
     }
 
     public function get_filtered($limit = 10, $offset = 0, $search_term = '')
@@ -58,7 +58,7 @@ class MY_Model extends CI_Model
         }
         $this->_add_is_deleted_filter();
         $this->_build_search_query($search_term);
-        return $this->db->order_by('id', 'asc')->get($this->table, $limit, $offset)->result();
+        return $this->db->order_by('id', 'desc')->get($this->table, $limit, $offset)->result();
     }
 
     public function count_all()

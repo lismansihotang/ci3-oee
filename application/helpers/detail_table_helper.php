@@ -2,95 +2,235 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-if (! function_exists('generate_table_view')) {
-    /**
-     * Generates a dynamic HTML table from an array of objects with custom formatting, alignment, and links.
-     *
-     * @param   array   $data           An array of objects.
-     * @param   array   $headers_map    An associative array where keys are header titles
-     * and values are object property names. Can also be a nested array to define format, alignment, and link.
-     * Example:
-     * [
-     * 'Product Name' => ['property' => 'nm_product', 'type' => 'link', 'url' => 'products/detail/', 'link_property' => 'id']
-     * ]
-     * @param   array   $attributes     An associative array of HTML attributes for the table tag.
-     * @return  string
-     */
-    function generate_table_view($data, $headers_map, $attributes = array())
+/**
+ * Table Helper
+ *
+ * Membantu membuat tabel HTML dinamis dengan konfigurasi kolom fleksibel.
+ *
+ * ===========================
+ * 🔧 Cara Pakai
+ * ===========================
+ *
+ * $headers_map = [
+ *   'kd_product' => [
+ *       'label' => 'Kode Produk',
+ *       'align' => 'center'
+ *   ],
+ *   'nm_product' => [
+ *       'label' => 'Nama Produk',
+ *       'property' => 'nm_product',
+ *       'type' => 'link',
+ *       'url' => 'products/view_by_code/',
+ *       'link_property' => 'kd_product'
+ *   ],
+ *   'qty' => [
+ *       'label' => 'Kuantitas',
+ *       'align' => 'right'
+ *   ],
+ *   'harga' => [
+ *       'label' => 'Harga',
+ *       'format' => 'currency',
+ *       'align' => 'right'
+ *   ],
+ *   'subtotal' => [
+ *       'label' => 'Subtotal',
+ *       'format' => 'currency',
+ *       'align' => 'right'
+ *   ],
+ *   'status' => [
+ *       'label' => 'Status',
+ *       'callback' => function($row) {
+ *           return ($row->qty > 50)
+ *               ? '<span class="badge bg-success">Ready</span>'
+ *               : '<span class="badge bg-warning">Low Stock</span>';
+ *       },
+ *       'align' => 'center'
+ *   ],
+ *   'actions' => [
+ *       'label' => 'Aksi',
+ *       'type'  => 'dropdown', // atau 'buttons'
+ *       'items' => [
+ *           [
+ *               'label' => 'Edit',
+ *               'url'   => 'products/edit/',
+ *               'property' => 'id'
+ *           ],
+ *           [
+ *               'label' => 'Delete',
+ *               'url'   => 'products/delete/',
+ *               'property' => 'id',
+ *               'class' => 'text-danger'
+ *           ]
+ *       ],
+ *       'align' => 'center'
+ *   ]
+ * ];
+ *
+ * echo generate_table_view($data, $headers_map, ['class' => 'table table-bordered']);
+ */
+
+/**
+ * Generate table view
+ */
+if (!function_exists('generate_table_view')) {
+    function generate_table_view($data, $headers_map, $attributes = [])
     {
-        if (empty($data) || ! is_array($data) || empty($headers_map)) {
+        if (empty($data) || !is_array($data) || empty($headers_map)) {
             return '<p>No data to display.</p>';
         }
 
-        // Generate table attributes
         $attr_string = '';
         foreach ($attributes as $key => $val) {
             $attr_string .= ' ' . html_escape($key) . '="' . html_escape($val) . '"';
         }
 
         $table = '<table' . $attr_string . '>';
-
-        // Generate table header
-        $table .= '<thead><tr>';
-        foreach ($headers_map as $header_title => $property_data) {
-            $th_align = is_array($property_data) && isset($property_data['align']) ? $property_data['align'] : 'left';
-            $table .= '<th style="text-align:' . html_escape($th_align) . ';">' . html_escape($header_title) . '</th>';
-        }
-        $table .= '</tr></thead>';
-
-        // Generate table body (rows)
-        $table .= '<tbody>';
-        foreach ($data as $row_object) {
-            $table .= '<tr>';
-            foreach ($headers_map as $header_title => $property_data) {
-                // Determine property name, type, format, and alignment
-                $property_name = is_array($property_data) ? $property_data['property'] : $property_data;
-                $type = is_array($property_data) && isset($property_data['type']) ? $property_data['type'] : null;
-                $format = is_array($property_data) && isset($property_data['format']) ? $property_data['format'] : null;
-                $params = is_array($property_data) && isset($property_data['params']) ? $property_data['params'] : null;
-                $td_align = is_array($property_data) && isset($property_data['align']) ? $property_data['align'] : 'left';
-
-                // Safely get the value
-                $cell_value = isset($row_object->$property_name) ? $row_object->$property_name : '';
-
-                $content_html = '';
-
-                // Apply formatting or create link
-                if ($type === 'link') {
-                    // Use a different property for the link value if specified, otherwise use the same property
-                    $link_property_name = isset($property_data['link_property']) ? $property_data['link_property'] : $property_name;
-                    $link_value = isset($row_object->$link_property_name) ? $row_object->$link_property_name : '';
-
-                    $link_url = base_url() . $property_data['url'] . $link_value;
-                    $link_text = isset($property_data['link_text']) ? $property_data['link_text'] : $cell_value;
-                    $content_html = '<a href="' . html_escape($link_url) . '" class="link-info link-underline link-underline-opacity-0 link-underline-opacity-100-hover">' . html_escape($link_text) . '</a>';
-                } else {
-                    switch ($format) {
-                        case 'currency':
-                            $formatted_value = 'Rp ' . number_format($cell_value, 2, ',', '.');
-                            break;
-                        case 'date':
-                            if (!empty($cell_value) && (new DateTime($cell_value)) !== false) {
-                                $formatted_value = date($params ?: 'Y-m-d', strtotime($cell_value));
-                            } else {
-                                $formatted_value = $cell_value;
-                            }
-                            break;
-                        default:
-                            $formatted_value = $cell_value;
-                            break;
-                    }
-                    $content_html = html_escape($formatted_value);
-                }
-
-                $table .= '<td style="text-align:' . html_escape($td_align) . ';">' . $content_html . '</td>';
-            }
-            $table .= '</tr>';
-        }
-        $table .= '</tbody>';
-
+        $table .= render_table_header($headers_map);
+        $table .= render_table_body($data, $headers_map);
         $table .= '</table>';
 
         return $table;
+    }
+}
+
+/**
+ * Render table header
+ */
+if (!function_exists('render_table_header')) {
+    function render_table_header($headers_map)
+    {
+        $html = '<thead><tr>';
+        foreach ($headers_map as $key => $col) {
+            $label = is_array($col) && isset($col['label']) ? $col['label'] : ucfirst($key);
+            $align = is_array($col) && isset($col['align']) ? $col['align'] : 'left';
+            $html .= '<th style="text-align:' . html_escape($align) . ';">' . html_escape($label) . '</th>';
+        }
+        $html .= '</tr></thead>';
+        return $html;
+    }
+}
+
+/**
+ * Render table body
+ */
+if (!function_exists('render_table_body')) {
+    function render_table_body($data, $headers_map)
+    {
+        $html = '<tbody>';
+        foreach ($data as $row) {
+            $html .= '<tr>';
+            foreach ($headers_map as $key => $col) {
+                $html .= render_table_cell($row, $col, $key);
+            }
+            $html .= '</tr>';
+        }
+        $html .= '</tbody>';
+        return $html;
+    }
+}
+
+/**
+ * Render single cell
+ */
+if (!function_exists('render_table_cell')) {
+    function render_table_cell($row, $col, $key)
+    {
+        $property_name = is_array($col) && isset($col['property']) ? $col['property'] : $key;
+        $type   = is_array($col) && isset($col['type']) ? $col['type'] : null;
+        $format = is_array($col) && isset($col['format']) ? $col['format'] : null;
+        $params = is_array($col) && isset($col['params']) ? $col['params'] : null;
+        $align  = is_array($col) && isset($col['align']) ? $col['align'] : 'left';
+
+        $cell_value = isset($row->$property_name) ? $row->$property_name : '';
+        $content_html = '';
+
+        if (!empty($col['callback']) && is_callable($col['callback'])) {
+            $content_html = call_user_func($col['callback'], $row, $col);
+        } elseif ($type === 'link') {
+            $content_html = render_link_cell($row, $col, $cell_value);
+        } elseif ($type === 'buttons') {
+            $content_html = render_buttons_cell($row, $col);
+        } elseif ($type === 'dropdown') {
+            $content_html = render_dropdown_cell($row, $col);
+        } else {
+            $content_html = render_formatted_cell($cell_value, $format, $params);
+        }
+
+        return '<td style="text-align:' . html_escape($align) . ';">' . $content_html . '</td>';
+    }
+}
+
+/**
+ * Render link cell
+ */
+if (!function_exists('render_link_cell')) {
+    function render_link_cell($row, $col, $cell_value)
+    {
+        $link_property = isset($col['link_property']) ? $col['link_property'] : $col['property'];
+        $link_value    = isset($row->$link_property) ? $row->$link_property : '';
+        $url = base_url($col['url'] . $link_value);
+        $text = isset($col['link_text']) ? $col['link_text'] : $cell_value;
+        return '<a href="' . html_escape($url) . '" class="link-info">' . html_escape($text) . '</a>';
+    }
+}
+
+/**
+ * Render buttons cell
+ */
+if (!function_exists('render_buttons_cell')) {
+    function render_buttons_cell($row, $col)
+    {
+        $html = '';
+        foreach ($col['items'] as $btn) {
+            $prop = isset($btn['property']) ? $btn['property'] : 'id';
+            $val  = isset($row->$prop) ? $row->$prop : '';
+            $url  = base_url($btn['url'] . $val);
+            $label = isset($btn['label']) ? $btn['label'] : 'Action';
+            $class = isset($btn['class']) ? $btn['class'] : 'btn btn-sm btn-primary';
+            $html .= '<a href="' . html_escape($url) . '" class="' . html_escape($class) . '">' . html_escape($label) . '</a> ';
+        }
+        return $html;
+    }
+}
+
+/**
+ * Render dropdown cell
+ */
+if (!function_exists('render_dropdown_cell')) {
+    function render_dropdown_cell($row, $col)
+    {
+        $html  = '<div class="dropdown">';
+        $html .= '<button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"><i class="icon cil-options"></i> Aksi </button>';
+        $html .= '<ul class="dropdown-menu">';
+        foreach ($col['items'] as $item) {
+            $prop = isset($item['property']) ? $item['property'] : 'id';
+            $val  = isset($row->$prop) ? $row->$prop : '';
+            $url  = base_url($item['url'] . $val);
+            $label = isset($item['label']) ? $item['label'] : 'Action';
+            $class = isset($item['class']) ? $item['class'] : '';
+            $html .= '<li><a class="dropdown-item ' . html_escape($class) . '" href="' . html_escape($url) . '">' . html_escape($label) . '</a></li>';
+        }
+        $html .= '</ul></div>';
+        return $html;
+    }
+}
+
+/**
+ * Render formatted cell
+ */
+if (!function_exists('render_formatted_cell')) {
+    function render_formatted_cell($value, $format = null, $params = null)
+    {
+        switch ($format) {
+            case 'currency':
+                return 'Rp ' . number_format($value, 2, ',', '.');
+            case 'date':
+                if (!empty($value) && strtotime($value) !== false) {
+                    return date($params ?: 'Y-m-d', strtotime($value));
+                }
+                return $value;
+            default:
+                return html_escape($value);
+        }
     }
 }

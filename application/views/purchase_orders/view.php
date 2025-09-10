@@ -1,3 +1,6 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <?= card_open('<i class="icon cil-spreadsheet"></i> Detail Purchase Orders') ?>
     <?php
     $this->load->helper('calculation');
@@ -55,16 +58,56 @@ $total_view = ($total) > 0 ? number_format($total) : 0;
    <?php
 
 $headers_map = array(
-  'Kode Produk' => ['property' => 'kd_product', 'align' => 'center'],
- 'Nama Produk' => [
+    'actions' => [
+        'label' => 'Ubah status',
+        'type'  => 'dropdown', // atau 'buttons'
+        'items' => [
+            [
+                'label' => 'Completed',
+                'url'   => 'products/edit/',
+                'property' => 'id',
+                'class' => 'text-success'
+            ],
+            [
+                'label' => 'Pending',
+                'url'   => 'products/delete/',
+                'property' => 'id',
+                'class' => 'text-warning'
+            ],
+            [
+                'label' => 'In-Progress',
+                'url'   => 'products/delete/',
+                'property' => 'id',
+                'class' => 'text-primary'
+            ],
+        ],
+    ],
+    'status' => [
+        'label' => 'Status',
+        'property' => 'status',
+        'type' => 'callback',
+        'callback' => function ($row) {
+            if ($row->status == '1') {
+                return '<span class="badge bg-primary">In-Progress</span>';
+            } elseif ($row->status == '2') {
+                return '<span class="badge bg-warning">Pending</span>';
+            } else {
+                return '<span class="badge bg-success">Completed</span>';
+            }
+        },
+        'align' => 'center'
+    ],
+  'kd_product' => ['label' => 'Kode Produk', 'property' => 'kd_product', 'align' => 'center'],
+'nm_product' => [
  'property' => 'nm_product',
+ 'label' => 'Nama Produk',
  'type' => 'link',
  'url' => 'products/view_by_code/',
  'link_property' => 'kd_product'
  ],
- 'Kuantitas' => ['property' => 'qty', 'align' => 'right'],
- 'Harga' => ['property' => 'harga', 'format' => 'currency', 'align' => 'right'],
- 'Subtotal' => ['property' => 'subtotal', 'format' => 'currency', 'align' => 'right'],
+ 'qty' => ['label' => 'Qty', 'property' => 'qty', 'align' => 'right'],
+ 'harga' => ['property' => 'harga','label' => 'Harga', 'format' => 'currency', 'align' => 'right'],
+ 'subtotal' => ['property' => 'subtotal','label' => 'Subtotal', 'format' => 'currency', 'align' => 'right'],
  );
 
 // Optional: table attributes for styling (e.g., using Bootstrap)

@@ -1,4 +1,5 @@
 <?php
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
@@ -32,10 +33,10 @@ class Jenis_downtimes extends MY_Controller
         parent::form($id, 'jenis_downtimes/form');
     }
 
-    public function view($id, $view = '')
+    public function view($id, $view = '', $data = [])
     {
         $this->setTitle('Detail Jenis Downtimes');
-        parent::view($id, 'jenis_downtimes/view');
+        parent::view($id, 'jenis_downtimes/view', $data = []);
     }
 
     public function delete($id)

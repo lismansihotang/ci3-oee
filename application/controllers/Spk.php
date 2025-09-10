@@ -1,5 +1,6 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * @property Spk_model $model
@@ -9,14 +10,14 @@ class Spk extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Spk_model','model');
+        $this->load->model('Spk_model', 'model');
         $this->controller_name = 'spk';
     }
 
     public function index($view = '')
     {
         $this->setTitle('Spk');
-        
+
         parent::index('spk/index');
     }
 
@@ -32,10 +33,10 @@ class Spk extends MY_Controller
         parent::form($id, 'spk/form');
     }
 
-    public function view($id, $view = '')
+    public function view($id, $view = '', $data = [])
     {
         $this->setTitle('Detail Spk');
-        parent::view($id, 'spk/view');
+        parent::view($id, 'spk/view', $data = []);
     }
 
     public function delete($id)

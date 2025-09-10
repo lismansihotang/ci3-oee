@@ -1,5 +1,6 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * @property Machines_model $model
@@ -9,14 +10,14 @@ class Machines extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Machines_model','model');
+        $this->load->model('Machines_model', 'model');
         $this->controller_name = 'machines';
     }
 
     public function index($view = '')
     {
         $this->setTitle('Machines');
-        
+
         parent::index('machines/index');
     }
 
@@ -32,10 +33,10 @@ class Machines extends MY_Controller
         parent::form($id, 'machines/form');
     }
 
-    public function view($id, $view = '')
+    public function view($id, $view = '', $data = [])
     {
         $this->setTitle('Detail Machines');
-        parent::view($id, 'machines/view');
+        parent::view($id, 'machines/view', $data = []);
     }
 
     public function delete($id)

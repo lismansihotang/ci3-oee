@@ -38,10 +38,10 @@ class Customers extends MY_Controller
     }
 
     // Metode view() harus memiliki parameter wajib $id.
-    public function view($id, $view = '')
+    public function view($id, $view = '', $data = [])
     {
         $this->setTitle('Detail Customer');
-        parent::view($id, 'customers/view');
+        parent::view($id, 'customers/view', $data = []);
     }
 
     // Metode delete() harus memiliki parameter wajib $id.

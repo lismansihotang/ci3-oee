@@ -33,10 +33,10 @@ class Products extends MY_Controller
         parent::form($id, 'products/form');
     }
 
-    public function view($id, $view = '')
+    public function view($id, $view = '', $data = [])
     {
         $this->setTitle('Detail Products');
-        parent::view($id, 'products/view');
+        parent::view($id, 'products/view', $data = []);
     }
 
     public function delete($id)

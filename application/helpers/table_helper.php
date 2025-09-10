@@ -87,7 +87,7 @@ if (!function_exists('build_table')) {
                 $counter++;
             }
         } else {
-            $colspan = count($headers) + (!empty($actions) ? 1 : 0);
+            $colspan = (count($headers) + (!empty($actions) ? 1 : 0)) + 1;
             $html .= '<tr><td colspan="' . $colspan . '" class="text-center">Tidak ada data</td></tr>';
         }
 

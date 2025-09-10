@@ -51,6 +51,11 @@ class MY_Controller extends CI_Controller
                 'type' => 'link'
             ],
             [
+                'label' => 'SPK',
+                'url' => 'spk',
+                'type' => 'link'
+            ],
+            [
                 'label' => 'Components',
                 'type' => 'nav-title'
             ],

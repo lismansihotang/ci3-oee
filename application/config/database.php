@@ -76,11 +76,11 @@ $query_builder = TRUE;
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
-	'port'   => 5432, # Added if using postgre
-	'username' => 'postgres',
-	'password' => 'P455w0rd',
-	'database' => 'oee_db',
-	'dbdriver' => 'postgre', //'mysqli',
+	//'port'   => 5432, # Added if using postgre
+	'username' => 'root',
+	'password' => 'kur@keissoft',
+	'database' => 'db_oee',
+	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
 	'db_debug' => (ENVIRONMENT !== 'production'),

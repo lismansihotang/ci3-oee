@@ -13,3 +13,4 @@ class Purchase_orders_model extends MY_Model
     // Tentukan kolom foreign key
     protected $foreign_key = 'id_po';
 }
+

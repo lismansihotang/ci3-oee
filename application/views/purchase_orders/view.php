@@ -1,7 +1,7 @@
 <?= card_open('<i class="icon cil-spreadsheet"></i> Detail Purchase Orders') ?>
     <?php
     $this->load->helper('calculation');
-$total = calculate_total($details, 'subtotal');
+$total = calculate_total($detail_orders, 'subtotal');
 $total_view = ($total) > 0 ? number_format($total) : 0;
 ?>
     <div class="row">
@@ -72,7 +72,7 @@ $table_attributes = array(
     'class' => 'table table-bordered table-hover border'
 );
 
-echo generate_table_view($details, $headers_map, $table_attributes);
+echo generate_table_view($detail_orders, $headers_map, $table_attributes);
 echo '<p class="text-end fs-5 fw-bolder text-decoration-underline">'.$total_view.'</p>';
 ?>
     <?= card_close() ?>

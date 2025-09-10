@@ -14,7 +14,11 @@ class Purchase_orders extends MY_Controller
         $this->load->model('Purchase_orders_model', 'model');
         $this->load->model('Products_model');
         $this->load->model('Customers_model');
+        $this->load->model('Purchase_order_details_model', 'Purchase_order_details');
         $this->controller_name = 'purchase_orders';
+
+        $this->model->set_group_by(['no_po']);
+        $this->model->set_order_by('no_po');
     }
 
     public function index($view = '')
@@ -70,14 +74,19 @@ class Purchase_orders extends MY_Controller
         $this->form_with_details($id, 'purchase_orders/form', $data);
     }
 
-    public function view($id = null, $view = '')
+    public function view($id = null, $view = '', $data = [])
     {
         if ($id === null || !is_numeric($id)) {
             redirect('purchase_orders/index');
         }
 
         $this->setTitle('Detail Purchase Order');
-        parent::view($id, 'purchase_orders/view');
+        $row = $this->model->get($id);
+        $models = $this->model->get_data(['no_po' => ($row) ? $row->no_po : null]);
+        $arrKeys = array_column_object($models, 'id');
+
+        $data['detail_orders'] = $this->Purchase_order_details->get_data([], $arrKeys, 'id_po');
+        parent::view($id, 'purchase_orders/view', $data);
     }
 
     public function delete($id)

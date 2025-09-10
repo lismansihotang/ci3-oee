@@ -1,4 +1,5 @@
 <?php
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
@@ -15,6 +16,9 @@ class MY_Model extends CI_Model
     protected $searchable_columns = [];
     protected $detail_table = '';
     protected $foreign_key = '';
+    protected $group_by = null;
+    protected $order_by = null;
+    protected $group_mode = 'MIN';
 
     public function __construct()
     {
@@ -23,16 +27,99 @@ class MY_Model extends CI_Model
         $this->load->library('session');
     }
 
-    protected function _build_search_query($search_term)
+    public function set_group_mode($mode = 'MIN')
     {
-        if (!empty($search_term) && !empty($this->searchable_columns)) {
+        $this->group_mode = strtoupper($mode) === 'MAX' ? 'MAX' : 'MIN';
+        return $this;
+    }
+
+    public function set_group_by($group_by)
+    {
+        $this->group_by = $group_by;
+        return $this;
+    }
+
+    public function set_order_by($field, $direction = 'DESC')
+    {
+        $this->order_by = [$field, strtoupper($direction)];
+        return $this;
+    }
+
+    private function _apply_query($search_term = '')
+    {
+        // filter soft delete
+        if ($this->db->field_exists('is_deleted', $this->table)) {
+            $this->db->where($this->table.'.is_deleted', 0);
+        }
+
+        // select + group
+        if ($this->group_by) {
+            $fields = $this->db->list_fields($this->table);
+            $selects = [];
+
+            foreach ($fields as $field) {
+                if ($field === 'id') {
+                    $selects[] = "{$this->group_mode}({$this->table}.id) as id";
+                } else {
+                    $selects[] = "{$this->group_mode}({$this->table}.{$field}) as {$field}";
+                }
+            }
+
+            $this->db->select(implode(", ", $selects), false);
+
+            $group = is_array($this->group_by) ? $this->group_by : [$this->group_by];
+            foreach ($group as $g) {
+                $this->db->group_by($g);
+            }
+
+            // order
+            if ($this->order_by) {
+                $this->db->order_by($this->order_by[0], $this->order_by[1], false);
+            } else {
+                $this->db->order_by('id', 'DESC', false); // alias id
+            }
+        } else {
+            $this->db->select($this->table.'.*');
+            if ($this->order_by) {
+                $this->db->order_by($this->order_by[0], $this->order_by[1], false);
+            } else {
+                $this->db->order_by($this->table.'.id', 'DESC');
+            }
+        }
+
+        // search
+        if ($search_term && $this->searchable_columns) {
             $search_term = strtolower($search_term);
             $this->db->group_start();
-            foreach ($this->searchable_columns as $column) {
-                $this->db->or_like("LOWER({$column})", $search_term, 'both');
+            foreach ($this->searchable_columns as $col) {
+                $this->db->or_like("LOWER($col)", $search_term, 'both', false);
             }
             $this->db->group_end();
         }
+    }
+
+    public function get_all($limit = 10, $offset = 0)
+    {
+        $this->_apply_query();
+        return $this->db->get($this->table, $limit, $offset)->result();
+    }
+
+    public function get_filtered($limit = 10, $offset = 0, $search_term = '')
+    {
+        $this->_apply_query($search_term);
+        return $this->db->get($this->table, $limit, $offset)->result();
+    }
+
+    public function count_all()
+    {
+        $this->_apply_query();
+        return $this->db->count_all_results($this->table);
+    }
+
+    public function count_filtered($search_term = '')
+    {
+        $this->_apply_query($search_term);
+        return $this->db->count_all_results($this->table);
     }
 
     private function _add_is_deleted_filter()
@@ -40,45 +127,6 @@ class MY_Model extends CI_Model
         if ($this->db->field_exists('is_deleted', $this->table)) {
             $this->db->where($this->table . '.is_deleted', 0);
         }
-    }
-
-    public function get_all($limit = 10, $offset = 0)
-    {
-        if (empty($this->table)) {
-            return [];
-        }
-        $this->_add_is_deleted_filter();
-        return $this->db->order_by('id', 'desc')->get($this->table, $limit, $offset)->result();
-    }
-
-    public function get_filtered($limit = 10, $offset = 0, $search_term = '')
-    {
-        if (empty($this->table)) {
-            return [];
-        }
-        $this->_add_is_deleted_filter();
-        $this->_build_search_query($search_term);
-        return $this->db->order_by('id', 'desc')->get($this->table, $limit, $offset)->result();
-    }
-
-    public function count_all()
-    {
-        if (empty($this->table)) {
-            return 0;
-        }
-        $this->_add_is_deleted_filter();
-        return $this->db->count_all_results($this->table);
-    }
-
-    public function count_filtered($search_term = '')
-    {
-        if (empty($this->table)) {
-            return 0;
-        }
-        $this->_add_is_deleted_filter();
-        $this->_build_search_query($search_term);
-        $this->db->from($this->table);
-        return $this->db->count_all_results();
     }
 
     public function get($id)
@@ -89,6 +137,33 @@ class MY_Model extends CI_Model
         $this->_add_is_deleted_filter();
         return $this->db->get_where($this->table, ['id' => $id])->row();
     }
+
+    public function get_data($where = [], $where_in = [], $field_where_in = '', $single = false)
+    {
+        if (empty($this->table)) {
+            return null;
+        }
+
+        // filter soft delete
+        if ($this->db->field_exists('is_deleted', $this->table)) {
+            $this->db->where($this->table.'.is_deleted', 0);
+        }
+
+        // where biasa
+        if (!empty($where)) {
+            $this->db->where($where);
+        }
+
+        // where_in
+        if (!empty($where_in) && !empty($field_where_in)) {
+            $this->db->where_in($field_where_in, $where_in);
+        }
+
+        $query = $this->db->get($this->table);
+
+        return $single ? $query->row() : $query->result();
+    }
+
 
     public function insert($data)
     {

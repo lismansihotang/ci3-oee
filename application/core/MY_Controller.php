@@ -30,7 +30,8 @@ class MY_Controller extends CI_Controller
             'table_form_detail_generic',
             'detail_table',
             'html',
-            'date'
+            'date',
+            'array'
         ]);
         $this->load->library(['session']);
 
@@ -232,7 +233,7 @@ class MY_Controller extends CI_Controller
         return $details;
     }
 
-    public function view($id, $view = '')
+    public function view($id, $view = '', $data = [])
     {
         $data['row'] = $this->model->get($id);
         if (!$data['row']) {

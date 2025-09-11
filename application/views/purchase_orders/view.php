@@ -60,25 +60,30 @@ $total_view = ($total) > 0 ? number_format($total) : 0;
 $headers_map = array(
     'actions' => [
         'label' => 'Ubah status',
-        'type'  => 'dropdown', // atau 'buttons'
+        'type'  => 'dropdown_post', // atau 'buttons'
+        'action' => 'purchase_orders/update_status/'.$row->id,
+        'id_field' => 'id',
         'items' => [
             [
                 'label' => 'Completed',
                 'url'   => 'products/edit/',
                 'property' => 'id',
-                'class' => 'text-success'
+                'class' => 'text-success',
+                'value' => '0'
             ],
             [
                 'label' => 'Pending',
                 'url'   => 'products/delete/',
                 'property' => 'id',
-                'class' => 'text-warning'
+                'class' => 'text-warning',
+                'value' => '2',
             ],
             [
                 'label' => 'In-Progress',
                 'url'   => 'products/delete/',
                 'property' => 'id',
-                'class' => 'text-primary'
+                'class' => 'text-primary',
+                'value' => '1'
             ],
         ],
     ],
@@ -88,11 +93,11 @@ $headers_map = array(
         'type' => 'callback',
         'callback' => function ($row) {
             if ($row->status == '1') {
-                return '<span class="badge bg-primary">In-Progress</span>';
+                return '<span class="badge rounded-pill bg-primary">In-Progress</span>';
             } elseif ($row->status == '2') {
-                return '<span class="badge bg-warning">Pending</span>';
+                return '<span class="badge rounded-pill bg-warning">Pending</span>';
             } else {
-                return '<span class="badge bg-success">Completed</span>';
+                return '<span class="badge rounded-pill bg-success">Completed</span>';
             }
         },
         'align' => 'center'
@@ -127,3 +132,6 @@ echo '<p class="text-end fs-5 fw-bolder text-decoration-underline">'.$total_view
         <div class="col-4"><?=generate_card_info(indo_date($row->updated_at, true).' > Updated By', $row->updated_by);?></div>   
     </div>
 <?= card_close() ?>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="<?= base_url('assets/js/sweetalert-helper.js') ?>"></script>

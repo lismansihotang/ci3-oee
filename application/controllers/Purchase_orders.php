@@ -93,4 +93,24 @@ class Purchase_orders extends MY_Controller
     {
         parent::delete($id);
     }
+
+    public function update_status($id)
+    {
+        if ($this->input->post()) {
+            $post_data = $this->input->post();
+
+            if ($this->Purchase_order_details->update($post_data['id'], ['status' => $post_data['status']])) {
+                $this->session->set_flashdata('swal_flash', json_encode([
+                                    'status' => 'success',
+                                    'message' => 'Status Data berhasil diubah!'
+                                ]));
+            } else {
+                $this->session->set_flashdata('swal_flash', json_encode([
+                                    'status' => 'error',
+                                    'message' => 'Status Data gagal diubah'
+                                ]));
+            }
+            redirect('purchase_orders/view/'.$id);
+        }
+    }
 }

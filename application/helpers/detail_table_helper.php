@@ -3,74 +3,34 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
- * Table Helper
+ * Generate dynamic HTML table with support for:
+ * - Custom headers (label, align)
+ * - Field type: text, link, button, dropdown, dropdown_post
+ * - Formatting (currency, date, custom callback)
+ * - Row actions with POST hidden field (dropdown_post)
  *
- * Membantu membuat tabel HTML dinamis dengan konfigurasi kolom fleksibel.
- *
- * ===========================
- * 🔧 Cara Pakai
- * ===========================
- *
+ * Example usage:
  * $headers_map = [
- *   'kd_product' => [
- *       'label' => 'Kode Produk',
- *       'align' => 'center'
+ *   'Kode Produk' => ['property' => 'kd_product', 'align' => 'center'],
+ *   'Nama Produk' => [
+ *      'property' => 'nm_product',
+ *      'type' => 'link',
+ *      'url'  => 'products/view_by_code/',
+ *      'link_property' => 'kd_product'
  *   ],
- *   'nm_product' => [
- *       'label' => 'Nama Produk',
- *       'property' => 'nm_product',
- *       'type' => 'link',
- *       'url' => 'products/view_by_code/',
- *       'link_property' => 'kd_product'
- *   ],
- *   'qty' => [
- *       'label' => 'Kuantitas',
- *       'align' => 'right'
- *   ],
- *   'harga' => [
- *       'label' => 'Harga',
- *       'format' => 'currency',
- *       'align' => 'right'
- *   ],
- *   'subtotal' => [
- *       'label' => 'Subtotal',
- *       'format' => 'currency',
- *       'align' => 'right'
- *   ],
- *   'status' => [
- *       'label' => 'Status',
- *       'callback' => function($row) {
- *           return ($row->qty > 50)
- *               ? '<span class="badge bg-success">Ready</span>'
- *               : '<span class="badge bg-warning">Low Stock</span>';
- *       },
- *       'align' => 'center'
- *   ],
- *   'actions' => [
- *       'label' => 'Aksi',
- *       'type'  => 'dropdown', // atau 'buttons'
- *       'items' => [
- *           [
- *               'label' => 'Edit',
- *               'url'   => 'products/edit/',
- *               'property' => 'id'
- *           ],
- *           [
- *               'label' => 'Delete',
- *               'url'   => 'products/delete/',
- *               'property' => 'id',
- *               'class' => 'text-danger'
- *           ]
- *       ],
- *       'align' => 'center'
+ *   'Harga' => ['property' => 'harga', 'format' => 'currency', 'align' => 'right'],
+ *   'Aksi'  => [
+ *      'type' => 'dropdown_post',
+ *      'action' => 'purchase_orders/update_status',
+ *      'id_field' => 'id',
+ *      'items' => [
+ *          ['label'=>'Set Pending','value'=>1,'class'=>'text-warning'],
+ *          ['label'=>'Set Complete','value'=>2,'class'=>'text-success'],
+ *      ]
  *   ]
  * ];
  *
- * echo generate_table_view($data, $headers_map, ['class' => 'table table-bordered']);
- */
-
-/**
- * Generate table view
+ * echo generate_table_view($data, $headers_map, ['class'=>'table table-bordered']);
  */
 if (!function_exists('generate_table_view')) {
     function generate_table_view($data, $headers_map, $attributes = [])
@@ -79,158 +39,170 @@ if (!function_exists('generate_table_view')) {
             return '<p>No data to display.</p>';
         }
 
+        // table attributes
         $attr_string = '';
         foreach ($attributes as $key => $val) {
             $attr_string .= ' ' . html_escape($key) . '="' . html_escape($val) . '"';
         }
 
         $table = '<table' . $attr_string . '>';
-        $table .= render_table_header($headers_map);
-        $table .= render_table_body($data, $headers_map);
-        $table .= '</table>';
 
+        // headers
+        $table .= '<thead><tr>';
+        foreach ($headers_map as $header_title => $col) {
+            $th_align = is_array($col) && isset($col['align']) ? $col['align'] : 'left';
+            $label    = is_array($col) && isset($col['label']) ? $col['label'] : $header_title;
+            $table .= '<th style="text-align:' . html_escape($th_align) . ';">' . html_escape($label) . '</th>';
+        }
+        $table .= '</tr></thead>';
+
+        // body
+        $table .= '<tbody>';
+        foreach ($data as $row) {
+            $table .= '<tr>';
+            foreach ($headers_map as $header_title => $col) {
+                $property = is_array($col) ? ($col['property'] ?? null) : $col;
+                $type     = is_array($col) && isset($col['type']) ? $col['type'] : 'text';
+                $format   = is_array($col) && isset($col['format']) ? $col['format'] : null;
+                $params   = is_array($col) && isset($col['params']) ? $col['params'] : null;
+                $align    = is_array($col) && isset($col['align']) ? $col['align'] : 'left';
+
+                $value = $property && isset($row->$property) ? $row->$property : '';
+
+                $content_html = '';
+                switch ($type) {
+                    case 'link':
+                        $link_property = $col['link_property'] ?? $property;
+                        $link_value    = $row->$link_property ?? '';
+                        $url           = base_url(($col['url'] ?? '') . $link_value);
+                        $text          = $col['link_text'] ?? $value;
+                        $content_html  = '<a href="' . html_escape($url) . '" class="link-info link-underline link-underline-opacity-0">' . html_escape($text) . '</a>';
+                        break;
+
+                    case 'button':
+                        $content_html = render_button_cell($row, $col);
+                        break;
+
+                    case 'dropdown':
+                        $content_html = render_dropdown_cell($row, $col);
+                        break;
+
+                    case 'dropdown_post':
+                        $content_html = render_dropdown_post_cell($row, $col);
+                        break;
+
+                    case 'callback':
+                        if (isset($col['callback']) && is_callable($col['callback'])) {
+                            $content_html = call_user_func($col['callback'], $row, $value);
+                        } else {
+                            $content_html = html_escape($value);
+                        }
+                        break;
+
+                    default:
+                        $content_html = format_value($value, $format, $params);
+                        break;
+                }
+
+                $table .= '<td style="text-align:' . html_escape($align) . ';">' . $content_html . '</td>';
+            }
+            $table .= '</tr>';
+        }
+        $table .= '</tbody>';
+
+        $table .= '</table>';
         return $table;
     }
 }
 
-/**
- * Render table header
+/* ==========================================================
+ * HELPER PARTS
+ * ==========================================================
  */
-if (!function_exists('render_table_header')) {
-    function render_table_header($headers_map)
-    {
-        $html = '<thead><tr>';
-        foreach ($headers_map as $key => $col) {
-            $label = is_array($col) && isset($col['label']) ? $col['label'] : ucfirst($key);
-            $align = is_array($col) && isset($col['align']) ? $col['align'] : 'left';
-            $html .= '<th style="text-align:' . html_escape($align) . ';">' . html_escape($label) . '</th>';
-        }
-        $html .= '</tr></thead>';
-        return $html;
-    }
-}
 
-/**
- * Render table body
- */
-if (!function_exists('render_table_body')) {
-    function render_table_body($data, $headers_map)
-    {
-        $html = '<tbody>';
-        foreach ($data as $row) {
-            $html .= '<tr>';
-            foreach ($headers_map as $key => $col) {
-                $html .= render_table_cell($row, $col, $key);
-            }
-            $html .= '</tr>';
-        }
-        $html .= '</tbody>';
-        return $html;
-    }
-}
-
-/**
- * Render single cell
- */
-if (!function_exists('render_table_cell')) {
-    function render_table_cell($row, $col, $key)
-    {
-        $property_name = is_array($col) && isset($col['property']) ? $col['property'] : $key;
-        $type   = is_array($col) && isset($col['type']) ? $col['type'] : null;
-        $format = is_array($col) && isset($col['format']) ? $col['format'] : null;
-        $params = is_array($col) && isset($col['params']) ? $col['params'] : null;
-        $align  = is_array($col) && isset($col['align']) ? $col['align'] : 'left';
-
-        $cell_value = isset($row->$property_name) ? $row->$property_name : '';
-        $content_html = '';
-
-        if (!empty($col['callback']) && is_callable($col['callback'])) {
-            $content_html = call_user_func($col['callback'], $row, $col);
-        } elseif ($type === 'link') {
-            $content_html = render_link_cell($row, $col, $cell_value);
-        } elseif ($type === 'buttons') {
-            $content_html = render_buttons_cell($row, $col);
-        } elseif ($type === 'dropdown') {
-            $content_html = render_dropdown_cell($row, $col);
-        } else {
-            $content_html = render_formatted_cell($cell_value, $format, $params);
-        }
-
-        return '<td style="text-align:' . html_escape($align) . ';">' . $content_html . '</td>';
-    }
-}
-
-/**
- * Render link cell
- */
-if (!function_exists('render_link_cell')) {
-    function render_link_cell($row, $col, $cell_value)
-    {
-        $link_property = isset($col['link_property']) ? $col['link_property'] : $col['property'];
-        $link_value    = isset($row->$link_property) ? $row->$link_property : '';
-        $url = base_url($col['url'] . $link_value);
-        $text = isset($col['link_text']) ? $col['link_text'] : $cell_value;
-        return '<a href="' . html_escape($url) . '" class="link-info">' . html_escape($text) . '</a>';
-    }
-}
-
-/**
- * Render buttons cell
- */
-if (!function_exists('render_buttons_cell')) {
-    function render_buttons_cell($row, $col)
-    {
-        $html = '';
-        foreach ($col['items'] as $btn) {
-            $prop = isset($btn['property']) ? $btn['property'] : 'id';
-            $val  = isset($row->$prop) ? $row->$prop : '';
-            $url  = base_url($btn['url'] . $val);
-            $label = isset($btn['label']) ? $btn['label'] : 'Action';
-            $class = isset($btn['class']) ? $btn['class'] : 'btn btn-sm btn-primary';
-            $html .= '<a href="' . html_escape($url) . '" class="' . html_escape($class) . '">' . html_escape($label) . '</a> ';
-        }
-        return $html;
-    }
-}
-
-/**
- * Render dropdown cell
- */
-if (!function_exists('render_dropdown_cell')) {
-    function render_dropdown_cell($row, $col)
-    {
-        $html  = '<div class="dropdown">';
-        $html .= '<button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"><i class="icon cil-options"></i> Aksi </button>';
-        $html .= '<ul class="dropdown-menu">';
-        foreach ($col['items'] as $item) {
-            $prop = isset($item['property']) ? $item['property'] : 'id';
-            $val  = isset($row->$prop) ? $row->$prop : '';
-            $url  = base_url($item['url'] . $val);
-            $label = isset($item['label']) ? $item['label'] : 'Action';
-            $class = isset($item['class']) ? $item['class'] : '';
-            $html .= '<li><a class="dropdown-item ' . html_escape($class) . '" href="' . html_escape($url) . '">' . html_escape($label) . '</a></li>';
-        }
-        $html .= '</ul></div>';
-        return $html;
-    }
-}
-
-/**
- * Render formatted cell
- */
-if (!function_exists('render_formatted_cell')) {
-    function render_formatted_cell($value, $format = null, $params = null)
+if (!function_exists('format_value')) {
+    function format_value($value, $format, $params = null)
     {
         switch ($format) {
             case 'currency':
-                return 'Rp ' . number_format($value, 2, ',', '.');
+                return 'Rp ' . number_format((float) $value, 2, ',', '.');
             case 'date':
-                if (!empty($value) && strtotime($value) !== false) {
+                if (!empty($value) && strtotime($value)) {
                     return date($params ?: 'Y-m-d', strtotime($value));
                 }
                 return $value;
             default:
                 return html_escape($value);
         }
+    }
+}
+
+if (!function_exists('render_button_cell')) {
+    function render_button_cell($row, $col)
+    {
+        $buttons = $col['buttons'] ?? [];
+        $html = '';
+        foreach ($buttons as $btn) {
+            $url   = base_url(($btn['url'] ?? '') . ($row->{$btn['id_field'] ?? 'id'} ?? ''));
+            $label = $btn['label'] ?? 'Action';
+            $class = $btn['class'] ?? 'btn btn-sm btn-primary';
+            $html .= '<a href="' . html_escape($url) . '" class="' . html_escape($class) . '">' . html_escape($label) . '</a> ';
+        }
+        return $html;
+    }
+}
+
+if (!function_exists('render_dropdown_cell')) {
+    function render_dropdown_cell($row, $col)
+    {
+        $items  = $col['items'] ?? [];
+        $id     = $row->{$col['id_field'] ?? 'id'} ?? '';
+        $menuId = 'dropdownMenu' . $id;
+
+        $html  = '<div class="dropdown">';
+        $html .= '<button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="' . $menuId . '" data-bs-toggle="dropdown" aria-expanded="false">Actions</button>';
+        $html .= '<ul class="dropdown-menu" aria-labelledby="' . $menuId . '">';
+
+        foreach ($items as $item) {
+            $url   = base_url(($item['url'] ?? '') . $id);
+            $label = $item['label'] ?? 'Action';
+            $class = $item['class'] ?? '';
+            $html .= '<li><a class="dropdown-item ' . html_escape($class) . '" href="' . html_escape($url) . '">' . html_escape($label) . '</a></li>';
+        }
+
+        $html .= '</ul></div>';
+        return $html;
+    }
+}
+
+if (!function_exists('render_dropdown_post_cell')) {
+    function render_dropdown_post_cell($row, $col)
+    {
+        $items   = $col['items'] ?? [];
+        $action  = $col['action'] ?? '';
+        $idField = $col['id_field'] ?? 'id';
+        $rowId   = $row->$idField ?? '';
+        $menuId  = 'dropdownPostMenu' . $rowId;
+
+        $html  = '<div class="dropdown">';
+        $html .= '<button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="' . $menuId . '" data-bs-toggle="dropdown" aria-expanded="false">Actions</button>';
+        $html .= '<ul class="dropdown-menu" aria-labelledby="' . $menuId . '">';
+
+        foreach ($items as $item) {
+            $label = $item['label'] ?? 'Action';
+            $value = $item['value'] ?? '';
+            $class = $item['class'] ?? '';
+
+            $html .= '<li>';
+            $html .= '<form method="post" action="' . base_url($action) . '" style="display:inline;">';
+            $html .= '<input type="hidden" name="' . html_escape($idField) . '" value="' . html_escape($rowId) . '">';
+            $html .= '<input type="hidden" name="status" value="' . html_escape($value) . '">';
+            $html .= '<button type="submit" class="dropdown-item ' . html_escape($class) . '">' . html_escape($label) . '</button>';
+            $html .= '</form>';
+            $html .= '</li>';
+        }
+
+        $html .= '</ul></div>';
+        return $html;
     }
 }

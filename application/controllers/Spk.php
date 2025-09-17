@@ -11,6 +11,8 @@ class Spk extends MY_Controller
     {
         parent::__construct();
         $this->load->model('Spk_model', 'model');
+        $this->load->model('Purchase_orders_model');
+        $this->load->model('Machines_model');
         $this->controller_name = 'spk';
     }
 
@@ -24,6 +26,11 @@ class Spk extends MY_Controller
     public function create($id = null, $view = '')
     {
         $this->setTitle('Tambah Data Spk');
+        
+        
+        $this->data['list_po'] = $this->Purchase_orders_model->get_dropdown();
+        $this->data['list_machines'] = $this->Machines_model->get_dropdown();
+
         parent::form(null, 'spk/form');
     }
 
@@ -43,4 +50,30 @@ class Spk extends MY_Controller
     {
         parent::delete($id);
     }
+
+   public function get_po_detail($id_po)
+{
+    $this->load->model('Purchase_orders_model', 'po');
+    $detail = $this->po->get_detail_by_po($id_po);
+
+    if (!$detail) {
+        log_message('debug', 'PO detail kosong untuk ID: ' . $id_po);
+        echo json_encode([]);
+        return;
+    }
+
+    $result = [
+        'kd_product' => $detail->kd_product,
+        'nama_produk' => $detail->nama_produk, 
+        'cavity'     => $detail->cavity,
+        'ct'         => $detail->ct,
+        'ct_print'         => $detail->ct_print,
+        'ct_stamp'         => $detail->ct_stamp,
+        'no_mould'         => $detail->no_mould,
+    ];
+
+    echo json_encode($result);
+}
+
+
 }

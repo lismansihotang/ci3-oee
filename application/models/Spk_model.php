@@ -26,4 +26,5 @@ class Spk_model extends MY_Model
         }
         return $this->db->insert($this->table, $data);
     }
+   
 }

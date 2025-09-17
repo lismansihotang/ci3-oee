@@ -1,12 +1,14 @@
 <?= card_open('<i class="icon cil-window"></i> Surat Perintah Kerja') ?>
 <form method="post">
 
+    <!-- NO SPK -->
     <div class="form-group mb-3">
         <label for="no_spk">No. SPK</label>
         <input type="text" id="no_spk" name="no_spk" class="form-control" 
                value="<?= isset($row) ? $row->no_spk : '' ?>">
     </div>
 
+    <!-- MESIN -->
     <div class="form-group mb-3">
         <label for="kd_machine">Mesin</label>
         <select id="kd_machine" name="kd_machine" class="form-control select2-init">
@@ -18,6 +20,7 @@
         </select>
     </div>
 
+    <!-- PO & Produk -->
     <div class="row">
         <div class="col-md-6 mb-3">
             <label for="no_po">No. PO</label>
@@ -31,13 +34,16 @@
         </div>
         <div class="col-md-6 mb-3">
             <label for="kd_product">Produk</label>
+            <!-- Hidden untuk database -->
 <input type="hidden" name="kd_product" id="kd_product" value="<?= isset($row) ? $row->kd_product : '' ?>">
 
+<!-- Hanya untuk tampil ke user -->
 <input type="text" id="kd_product_display" class="form-control" readonly
        value="<?= isset($row) ? $row->kd_product . ' - ' . $row->nama_produk : '' ?>">
         </div>
     </div>
 
+    <!-- NO MOULD & ORDER -->
     <div class="row">
         <div class="col-md-6 mb-3">
             <label for="no_mould">No. Mould</label>
@@ -51,6 +57,7 @@
         </div>
     </div>
 
+    <!-- Cavity & Cycle Time -->
     <fieldset class="border p-3 mb-3">
         <legend class="w-auto px-2">Detail Produksi</legend>
         <div class="row">
@@ -81,6 +88,8 @@
             </div>
         </div>
     </fieldset>
+
+    <!-- Target -->
     <fieldset class="border p-3 mb-3">
         <legend class="w-auto px-2">Target Produksi</legend>
         <div class="row text-center fw-bold">
@@ -109,6 +118,8 @@
         </div>
 
     </fieldset>
+
+    <!-- Tanggal -->
     <div class="row">
         <div class="col-md-6 mb-3">
             <label for="tgl_mulai">Mulai Produksi</label>
@@ -122,11 +133,13 @@
         </div>
     </div>
 
+    <!-- Keterangan -->
     <div class="form-group mb-3">
         <label for="keterangan">Keterangan</label>
         <textarea id="keterangan" name="keterangan" class="form-control"><?= isset($row) ? $row->keterangan : '' ?></textarea>
     </div>
 
+    <!-- Status -->
     <div class="form-group mb-3">
         <label for="status">Status</label>
         <select id="status" name="status" class="form-control">
@@ -135,6 +148,7 @@
         </select>
     </div>
 
+    <!-- Tombol -->
     <div class="d-flex justify-content-between">
         <button type="submit" class="btn btn-success">Simpan</button>
         <button type="reset" class="btn btn-secondary">Batal</button>
@@ -146,9 +160,15 @@
 
 
 
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- CSS Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Theme Bootstrap-5 untuk Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+<!-- JS Select2 -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
@@ -164,6 +184,7 @@ $(document).ready(function() {
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
+                    console.log("Data dari server:", data);
 
                     if (data) {
                         $('#kd_product').val(data.kd_product);
@@ -174,6 +195,7 @@ $(document).ready(function() {
                         $('#ct_stamp').val(data.ct_stamp);
                         $('#no_mould').val(data.no_mould);
 
+                        // Hanya hitung target ketika PO dipilih
                         hitungTarget();
 
                         console.log("Set ke input:", 
@@ -255,11 +277,11 @@ $(document).ready(function() {
 
     // Trigger otomatis
     $('#cavity, #ct').on('input change', function() {
-        hitungTarget(); 
+        hitungTarget(); // hanya target
     });
 
     $('#jml_ord, #tgl_mulai').on('input change', function() {
-        hitungTanggalSelesai(); 
+        hitungTanggalSelesai(); // hanya tanggal selesai
     });
 
 });
@@ -269,7 +291,7 @@ $(document).ready(function() {
 $(document).ready(function() {
     $(".select2-init").select2({
         theme: "bootstrap-5",
-        width: '100%'
+        width: '100%' // biar full sesuai parent col-md
     });
 });
 </script>

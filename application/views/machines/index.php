@@ -7,7 +7,7 @@
     ]) ?>
     <?= build_table([
         'headers' => array (
-  'id' => 'Id',
+  'id' => 'ID',
   'kode_mesin' => 'KODE',
   'nama_mesin' => 'NAMA',
   'jenis_mesin' => 'JENIS',

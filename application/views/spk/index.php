@@ -8,7 +8,7 @@
     <?= build_table([
         'headers' => array(
   //'id' => 'Id',
-  'no_spk' => 'No_spk',
+  'no_spk' => 'NO.SPK',
   'kd_machine' => 'Kd_machine',
   'kd_product' => 'Kd_product',
   /**'cavity' => 'Cavity',

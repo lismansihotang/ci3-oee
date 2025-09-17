@@ -1,4 +1,5 @@
 <?php
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
@@ -27,7 +28,7 @@ class GeneratorTool extends CI_Controller
     {
         $this->form_validation->set_rules('table', 'Table Name', 'required');
 
-        if ($this->form_validation->run() === FALSE) {
+        if ($this->form_validation->run() === false) {
             $this->index();
             return;
         }
@@ -101,6 +102,8 @@ class {$module} extends MY_Controller
         parent::__construct();
         \$this->load->model('{$module}_model','model');
         \$this->controller_name = '{$table}';
+        \$this->model->set_group_by([]);
+        \$this->model->set_order_by();
     }
 
     public function index(\$view = '')
@@ -122,7 +125,7 @@ class {$module} extends MY_Controller
         parent::form(\$id, '{$table}/form');
     }
 
-    public function view(\$id, \$view = '')
+    public function view(\$id, \$view = '', \$data = [])
     {
         \$this->setTitle('Detail {$module}');
         parent::view(\$id, '{$table}/view');
@@ -172,7 +175,9 @@ class {$module} extends MY_Controller
         $formFields = "";
         foreach ($fields as $f) {
             $isPK = property_exists($f, 'primary_key') && $f->primary_key == 1;
-            if ($isPK) continue;
+            if ($isPK) {
+                continue;
+            }
 
             $formFields .= "<?= bs_floating_input('{$f->name}', 'text', (isset(\$row) ? \$row->{$f->name} : '')); ?>";
         }

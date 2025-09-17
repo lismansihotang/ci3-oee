@@ -85,6 +85,11 @@ class MY_Controller extends CI_Controller
                 'url' => 'products',
                 'type' => 'link'
             ],
+            [
+                'label' => 'Operators',
+                'url' => 'operators',
+                'type' => 'link'
+            ],
         ];
 
         if (!$this->session->userdata('logged_in') && $this->router->fetch_class() != 'auth') {

@@ -15,7 +15,6 @@ class Operators_model extends MY_Model
         $this->db->where('password', $password);
         $query = $this->db->get($this->table);
 
-        var_dump($this->db->last_query());
         return $query->row();
     }
 }

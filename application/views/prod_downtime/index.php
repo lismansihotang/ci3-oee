@@ -1,5 +1,5 @@
-<?= card_open('<i class="icon cil-list"></i> List of Jenis_downtimes') ?>
-    <?= build_index_header('jenis_downtimes', [
+<?= card_open('<i class="icon cil-list"></i> List of Prod_downtime') ?>
+    <?= build_index_header('prod_downtime', [
         'search_term' => $search_term,
         'total_rows' => $total_rows,
         'from_rows' => $from_rows,
@@ -8,8 +8,12 @@
     <?= build_table([
         'headers' => array (
   'id' => 'Id',
-  'kode' => 'Kode',
-  'nama' => 'Nama',
+  'shift_id' => 'Shift_id',
+  'downtime_id' => 'Downtime_id',
+  'start_time' => 'Start_time',
+  'end_time' => 'End_time',
+  'duration_min' => 'Duration_min',
+  'notes' => 'Notes',
   'is_deleted' => 'Is_deleted',
   'created_by' => 'Created_by',
   'updated_by' => 'Updated_by',
@@ -20,9 +24,9 @@
 ),
         'rows' => $rows,
         'actions' => [
-            'view' => 'jenis_downtimes/view',
-            'edit' => 'jenis_downtimes/edit',
-            'delete' => 'jenis_downtimes/delete'
+            'view' => 'prod_downtime/view',
+            'edit' => 'prod_downtime/edit',
+            'delete' => 'prod_downtime/delete'
         ]
     ],$offset) ?>
     <?= $pagination ?>

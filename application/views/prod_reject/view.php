@@ -1,4 +1,4 @@
-<?= card_open('<i class="icon cil-spreadsheet"></i> Detail Jenis_downtimes') ?>
+<?= card_open('<i class="icon cil-spreadsheet"></i> Detail Prod_reject') ?>
     <table class="table table-bordered">
         
     <tr>
@@ -6,12 +6,16 @@
         <td><?= $row->id ?></td>
     </tr>
     <tr>
-        <th>kode</th>
-        <td><?= $row->kode ?></td>
+        <th>prod_detail_id</th>
+        <td><?= $row->prod_detail_id ?></td>
     </tr>
     <tr>
-        <th>nama</th>
-        <td><?= $row->nama ?></td>
+        <th>kd_reject</th>
+        <td><?= $row->kd_reject ?></td>
+    </tr>
+    <tr>
+        <th>qty</th>
+        <td><?= $row->qty ?></td>
     </tr>
     <tr>
         <th>is_deleted</th>
@@ -44,9 +48,9 @@
     </table>
     <div class="mt-3">
         <div class="btn-group" role="group" aria-label="FormCreateUpdate">
-            <a href="<?= site_url('jenis_downtimes/edit/'.$row->id) ?>" class="btn btn-warning" data-coreui-toggle="tooltip" data-coreui-placement"top" title="Edit Data Ini"><i class="icon cil-pencil"></i> Edit</a>
-            <a href="<?= site_url('jenis_downtimes/delete/'.$row->id) ?>" class="btn btn-danger" onclick="return confirm('Hapus data ini?')" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Hapus Data Ini"><i class="icon cil-trash"></i> Delete</a>
-            <a href="<?= site_url('jenis_downtimes') ?>" class="btn btn-secondary" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke List Data"><i class="icon cil-reload"></i> Kembali</a>
+            <a href="<?= site_url('prod_reject/edit/'.$row->id) ?>" class="btn btn-warning" data-coreui-toggle="tooltip" data-coreui-placement"top" title="Edit Data Ini"><i class="icon cil-pencil"></i> Edit</a>
+            <a href="<?= site_url('prod_reject/delete/'.$row->id) ?>" class="btn btn-danger" onclick="return confirm('Hapus data ini?')" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Hapus Data Ini"><i class="icon cil-trash"></i> Delete</a>
+            <a href="<?= site_url('prod_reject') ?>" class="btn btn-secondary" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke List Data"><i class="icon cil-reload"></i> Kembali</a>
             <a href="<?= site_url('/') ?>" class="btn btn-outline-dark" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke Halaman Utama"><i class="icon cil-home"></i> </a>
         </div>
     </div>

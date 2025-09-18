@@ -2,42 +2,42 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * @property Products_model $model
+ * @property Prod_reject_model $model
  */
-class Products extends MY_Controller
+class Prod_reject extends MY_Controller
 {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Products_model','model');
-        $this->controller_name = 'products';
+        $this->load->model('Prod_reject_model','model');
+        $this->controller_name = 'prod_reject';
         $this->model->set_group_by([]);
         $this->model->set_order_by();
     }
 
     public function index($view = '')
     {
-        $this->setTitle('Products');
+        $this->setTitle('Prod_reject');
         
-        parent::index('products/index');
+        parent::index('prod_reject/index');
     }
 
     public function create($id = null, $view = '')
     {
-        $this->setTitle('Tambah Data Products');
-        parent::form(null, 'products/form');
+        $this->setTitle('Tambah Data Prod_reject');
+        parent::form(null, 'prod_reject/form');
     }
 
     public function edit($id, $view = '')
     {
-        $this->setTitle('Ubah Data Products');
-        parent::form($id, 'products/form');
+        $this->setTitle('Ubah Data Prod_reject');
+        parent::form($id, 'prod_reject/form');
     }
 
     public function view($id, $view = '', $data = [])
     {
-        $this->setTitle('Detail Products');
-        parent::view($id, 'products/view');
+        $this->setTitle('Detail Prod_reject');
+        parent::view($id, 'prod_reject/view');
     }
 
     public function delete($id)

@@ -57,6 +57,26 @@ class MY_Controller extends CI_Controller
                 'type' => 'link'
             ],
             [
+                'label' => 'Production (Log)',
+                'url' => 'prod_shift_log',
+                'type' => 'link'
+            ],
+            [
+                'label' => 'Production (Detail)',
+                'url' => 'prod_detail',
+                'type' => 'link'
+            ],
+            [
+                'label' => 'Production (Downtime)',
+                'url' => 'prod_downtime',
+                'type' => 'link'
+            ],
+            [
+                'label' => 'Jenis Reject',
+                'url' => 'jenis_reject',
+                'type' => 'link'
+            ],
+            [
                 'label' => 'Components',
                 'type' => 'nav-title'
             ],
@@ -261,14 +281,14 @@ class MY_Controller extends CI_Controller
     {
         if ($this->model->delete($id)) {
             $this->session->set_flashdata('swal_flash', json_encode([
-                    'status' => 'success',
-                    'message' => 'Data berhasil dihapus!'
-                ]));
+                'status' => 'success',
+                'message' => 'Data berhasil dihapus!'
+            ]));
         } else {
             $this->session->set_flashdata('swal_flash', json_encode([
-                    'status' => 'error',
-                    'message' => 'Data gagal dihapus!'
-                ]));
+                'status' => 'error',
+                'message' => 'Data gagal dihapus!'
+            ]));
         }
         redirect($this->controller_name);
     }

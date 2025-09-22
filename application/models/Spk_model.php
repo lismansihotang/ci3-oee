@@ -26,5 +26,24 @@ class Spk_model extends MY_Model
         }
         return $this->db->insert($this->table, $data);
     }
-   
+   public function get_dropdown()
+{
+    $result = $this->db->select('id, no_spk, kd_product')
+                       ->from('spk')
+                       ->order_by('id', 'DESC')
+                       ->get()
+                       ->result();
+
+    $dropdown = ['' => '-- Pilih SPK --'];
+    foreach ($result as $row) {
+        $dropdown[$row->id] = $row->id . ' - ' . $row->no_spk. ' - ' .$row->kd_product;
+    }
+    return $dropdown;
+}
+
+ public function get_by_id($id_spk)
+    {
+        return $this->db->get_where($this->table, ['id' => $id_spk])->row();
+    }
+
 }

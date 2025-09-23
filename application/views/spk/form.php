@@ -24,10 +24,10 @@
         </div>
         <div class="col-6">
             <?= card_open('<i class="icon cil-settings"></i> Detail Produksi', ['class' => 'border-info']) ?>
-            <?= bs_floating_input('cavity', 'text', (isset($row) ? $row->cavity : ''), null, null, [], 'Cavity'); ?>
-            <?= bs_floating_input('ct', 'text', (isset($row) ? $row->ct : ''), null, null, [], 'Cycle Time (Produksi)'); ?>
-            <?= bs_floating_input('ct_print', 'text', (isset($row) ? $row->ct_print : ''), null, null, [], 'Cycle Time (Printing)'); ?>
-            <?= bs_floating_input('ct_stamp', 'text', (isset($row) ? $row->ct_stamp : ''), null, null, [], 'Cycle Time (Stamping)'); ?>
+            <?= bs_floating_input('cavity', 'text', (isset($row) ? $row->cavity : ''), null, 'cavity', [], 'Cavity'); ?>
+            <?= bs_floating_input('ct', 'text', (isset($row) ? $row->ct : ''), null, 'ct', [], 'Cycle Time (Produksi)'); ?>
+            <?= bs_floating_input('ct_print', 'text', (isset($row) ? $row->ct_print : ''), null, 'ct_print', [], 'Cycle Time (Printing)'); ?>
+            <?= bs_floating_input('ct_stamp', 'text', (isset($row) ? $row->ct_stamp : ''), null, 'ct_stamp', [], 'Cycle Time (Stamping)'); ?>
             <?= card_close() ?>
             <?= card_open('<i class="icon cil-settings"></i> Target Produksi', ['class' => 'border-primary']) ?>
             <p class="mt-1 mb-0">T/Jam</p>

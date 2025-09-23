@@ -1,8 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-if ( ! function_exists('get_shift_hours')) {
-    
+if (! function_exists('get_shift_hours')) {
+
     function get_shift_hours($shift)
     {
         $hours = [];
@@ -33,5 +33,34 @@ if ( ! function_exists('get_shift_hours')) {
         }
 
         return $hours;
+    }
+}
+
+if (! function_exists('get_shift_hours_rev')) {
+    function get_shift_hours_rev($shift, $asObject = true)
+    {
+        $results = [];
+
+        if ($shift == 1) {
+            // Shift 1: 08:00 - 16:00
+            $start = strtotime('08:00');
+            $end   = strtotime('16:00');
+        } elseif ($shift == 2) {
+            // Shift 2: 16:00 - 00:00
+            $start = strtotime('16:00');
+            $end   = strtotime('23:59');
+        } else {
+            // Shift 3: 00:00 - 08:00
+            $start = strtotime('00:00');
+            $end   = strtotime('08:00');
+        }
+
+        while ($start < $end) {
+            $hour = date('H:i', $start);
+            $results[] = $asObject ? (object)['jam' => $hour] : $hour;
+            $start = strtotime('+1 hour', $start);
+        }
+
+        return $results;
     }
 }

@@ -93,10 +93,10 @@ if (!function_exists('render_detail_row_generic')) {
                 unset($attrs['class']);
 
                 $out .= '<input name="' . $field . '" type="' . html_escape($type) . '"'
-                      . ' value="' . html_escape($val) . '"'
-                      . ' class="' . html_escape($class) . '"'
-                      . build_attr_string($attrs)
-                      . ' />';
+                    . ' value="' . html_escape($val) . '"'
+                    . ' class="' . html_escape($class) . '"'
+                    . build_attr_string($attrs)
+                    . ' />';
             }
             $out .= '</td>';
         }

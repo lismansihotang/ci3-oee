@@ -33,7 +33,7 @@
             <p class="mt-1 mb-0">T/Jam</p>
             <div class="row">
                 <div class="col-4">
-                    <?= bs_floating_input('tjam', 'number', (isset($row) ? $row->tjam : ''), null, 'tjam', [], 'Produksi'); ?>
+                    <?= bs_floating_input('tjam', 'number', (isset($row) ? $row->tjam : ''), null, 't_jam', [], 'Produksi'); ?>
                 </div>
                 <div class="col-4">
                     <?= bs_floating_input('print_jam', 'number', (isset($row) ? $row->printjam : ''), null, 'print_jam', [], 'Printing'); ?>
@@ -46,7 +46,7 @@
             <p class="mt-1 mb-0">T/Shift</p>
             <div class="row">
                 <div class="col-4">
-                    <?= bs_floating_input('tshift', 'number', (isset($row) ? $row->tshift : ''), null, 'tshift', [], 'Produksi'); ?>
+                    <?= bs_floating_input('tshift', 'number', (isset($row) ? $row->tshift : ''), null, 't_shift', [], 'Produksi'); ?>
                 </div>
                 <div class="col-4">
                     <?= bs_floating_input('print_shift', 'number', (isset($row) ? $row->printshift : ''), null, 'print_shift', [], 'Printing'); ?>
@@ -59,7 +59,7 @@
             <p class="mt-1 mb-0">T/Day</p>
             <div class="row">
                 <div class="col-4">
-                    <?= bs_floating_input('tday', 'number', (isset($row) ? $row->tday : ''), null, 'tday', [], 'Produksi'); ?>
+                    <?= bs_floating_input('tday', 'number', (isset($row) ? $row->tday : ''), null, 't_day', [], 'Produksi'); ?>
                 </div>
                 <div class="col-4">
                     <?= bs_floating_input('print_day', 'number', (isset($row) ? $row->printday : ''), null, 'print_day', [], 'Printing'); ?>

@@ -38,6 +38,7 @@ class Purchase_orders_model extends MY_Model
             ->get()
             ->result();
 
+        //$dropdown = ['' => '-- Pilih PO --', '1' => 'x'];
         $dropdown = ['' => '-- Pilih PO --'];
         foreach ($result as $row) {
             // tampilkan nomor PO + nama produk (kalau ada)

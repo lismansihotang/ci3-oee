@@ -7,6 +7,7 @@
     ]) ?>
     <?= build_table([
         'headers' => array (
+
 //   'id' => 'Id',
   'prod_id' => 'Prod ID',
   'kd_ms' => 'Kode Mesin',
@@ -25,6 +26,7 @@
 //   'created_at' => 'Created_at',
 //   'updated_at' => 'Updated_at',
 //   'deleted_at' => 'Deleted_at',
+
 ),
         'rows' => $rows,
         'actions' => [

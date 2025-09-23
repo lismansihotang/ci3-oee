@@ -1,0 +1,12 @@
+<?= card_open(isset($row) ? '<i class="icon cil-window"></i> Edit Prod_shift_log' : '<i class="icon cil-window"></i> Tambah Prod_shift_log') ?>
+    <form method="post">
+        <?= bs_floating_input('id', 'text', (isset($row) ? $row->id : '')); ?><?= bs_floating_input('kd_ms', 'text', (isset($row) ? $row->kd_ms : '')); ?><?= bs_floating_input('tanggal', 'text', (isset($row) ? $row->tanggal : '')); ?><?= bs_floating_input('shift_no', 'text', (isset($row) ? $row->shift_no : '')); ?><?= bs_floating_input('leader_id', 'text', (isset($row) ? $row->leader_id : '')); ?><?= bs_floating_input('status', 'text', (isset($row) ? $row->status : '')); ?><?= bs_floating_input('total_pass', 'text', (isset($row) ? $row->total_pass : '')); ?><?= bs_floating_input('total_reject', 'text', (isset($row) ? $row->total_reject : '')); ?><?= bs_floating_input('total_hold', 'text', (isset($row) ? $row->total_hold : '')); ?><?= bs_floating_input('finish_qty', 'text', (isset($row) ? $row->finish_qty : '')); ?><?= bs_floating_input('is_deleted', 'text', (isset($row) ? $row->is_deleted : '')); ?><?= bs_floating_input('created_by', 'text', (isset($row) ? $row->created_by : '')); ?><?= bs_floating_input('updated_by', 'text', (isset($row) ? $row->updated_by : '')); ?><?= bs_floating_input('deleted_by', 'text', (isset($row) ? $row->deleted_by : '')); ?><?= bs_floating_input('created_at', 'text', (isset($row) ? $row->created_at : '')); ?><?= bs_floating_input('updated_at', 'text', (isset($row) ? $row->updated_at : '')); ?><?= bs_floating_input('deleted_at', 'text', (isset($row) ? $row->deleted_at : '')); ?>
+        <div class="mt-3">
+            <div class="btn-group" role="group" aria-label="FormCreateUpdate">
+                <button type="submit" class="btn btn-success" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Simpan Data Sekarang"><i class="icon cil-save"></i> Simpan</button>
+                <a href="<?= site_url('prod_shift_log') ?>" class="btn btn-secondary" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke List Data"><i class="icon cil-reload"></i> Kembali</a>
+                <a href="<?= site_url('/') ?>" class="btn btn-outline-dark" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke Halaman Utama"><i class="icon cil-home"></i></a>
+            </div>
+        </div>
+    </form>
+<?= card_close() ?>

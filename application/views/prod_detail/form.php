@@ -1,6 +1,8 @@
 <?= card_open(isset($row) ? '<i class="icon cil-window"></i> Edit Prod_detail' : '<i class="icon cil-window"></i> Tambah Prod_detail') ?>
     <form method="post">
+
         <?= bs_floating_input('prod_id', 'text', (isset($row) ? $row->prod_id : '')); ?><?= bs_floating_input('jam_mulai', 'text', (isset($row) ? $row->jam_mulai : '')); ?><?= bs_floating_input('jam_selesai', 'text', (isset($row) ? $row->jam_selesai : '')); ?><?= bs_floating_input('pass_qty', 'text', (isset($row) ? $row->pass_qty : '')); ?><?= bs_floating_input('finish_qty', 'text', (isset($row) ? $row->finish_qty : '')); ?><?= bs_floating_input('is_deleted', 'text', (isset($row) ? $row->is_deleted : '')); ?><?= bs_floating_input('created_by', 'text', (isset($row) ? $row->created_by : '')); ?><?= bs_floating_input('updated_by', 'text', (isset($row) ? $row->updated_by : '')); ?><?= bs_floating_input('deleted_by', 'text', (isset($row) ? $row->deleted_by : '')); ?><?= bs_floating_input('created_at', 'text', (isset($row) ? $row->created_at : '')); ?><?= bs_floating_input('updated_at', 'text', (isset($row) ? $row->updated_at : '')); ?><?= bs_floating_input('deleted_at', 'text', (isset($row) ? $row->deleted_at : '')); ?>
+
         <div class="mt-3">
             <div class="btn-group" role="group" aria-label="FormCreateUpdate">
                 <button type="submit" class="btn btn-success" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Simpan Data Sekarang"><i class="icon cil-save"></i> Simpan</button>

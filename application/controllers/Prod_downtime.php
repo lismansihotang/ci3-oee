@@ -12,6 +12,7 @@ class Prod_downtime extends MY_Controller
         $this->load->model('Prod_downtime_model','model');
         $this->controller_name = 'prod_downtime';
         $this->model->set_group_by([]);
+        $this->model->set_order_by('id');
     }
 
     public function index($view = '')

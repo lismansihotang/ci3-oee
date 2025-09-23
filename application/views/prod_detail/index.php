@@ -7,6 +7,7 @@
     ]) ?>
     <?= build_table([
         'headers' => array (
+
         // 'id' => 'Id',
         'prod_id' => 'Prod ID',
         'jam_mulai' => 'Start Time',
@@ -21,6 +22,7 @@
         // 'updated_at' => 'Updated_at',
         // 'deleted_at' => 'Deleted_at',
         ),
+
         'rows' => $rows,
         'actions' => [
             'view' => 'prod_detail/view',

@@ -103,7 +103,7 @@ class {$module} extends MY_Controller
         \$this->load->model('{$module}_model','model');
         \$this->controller_name = '{$table}';
         \$this->model->set_group_by([]);
-        \$this->model->set_order_by();
+        \$this->model->set_order_by('id');
     }
 
     public function index(\$view = '')

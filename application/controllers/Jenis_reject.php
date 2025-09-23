@@ -12,6 +12,7 @@ class Jenis_reject extends MY_Controller
         $this->load->model('Jenis_reject_model','model');
         $this->controller_name = 'jenis_reject';
         $this->model->set_group_by([]);
+
         $this->model->set_order_by('id');
     }
 

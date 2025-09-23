@@ -6,8 +6,8 @@
         <td><?= $row->id ?></td>
     </tr>
     <tr>
-        <th>shift_id</th>
-        <td><?= $row->shift_id ?></td>
+        <th>prod_id</th>
+        <td><?= $row->prod_id ?></td>
     </tr>
     <tr>
         <th>jam_mulai</th>

@@ -12,6 +12,7 @@ class Prod_detail extends MY_Controller
         $this->load->model('Prod_detail_model','model');
         $this->controller_name = 'prod_detail';
         $this->model->set_group_by([]);
+
         $this->model->set_order_by('id');
     }
 

@@ -57,6 +57,23 @@ class MY_Controller extends CI_Controller
                 'type' => 'link'
             ],
             [
+                'label' => 'Prod_Utama',
+                'url' => 'prod_utama',
+                'type' => 'link'
+            ],
+             [
+                'label' => 'Prod_Detail',
+                'url' => 'prod_detail',
+                'type' => 'link'
+            ],
+             [
+                'label' => 'Prod_QC',
+                'url' => 'prod_qc',
+                'type' => 'link'
+            ],
+            [
+                'label' => 'Prod_Downtime',
+                'url' => 'prod_downtime',
                 'label' => 'Production (Log)',
                 'url' => 'prod_shift_log',
                 'type' => 'link'
@@ -98,6 +115,16 @@ class MY_Controller extends CI_Controller
             [
                 'label' => 'Jenis Downtimes',
                 'url' => 'jenis_downtimes',
+                'type' => 'link'
+            ],
+            [
+                'label' => 'Jenis Reject',
+                'url' => 'jenis_reject',
+                'type' => 'link'
+            ],
+             [
+                'label' => 'Jenis QC',
+                'url' => 'jenis_qc',
                 'type' => 'link'
             ],
             [

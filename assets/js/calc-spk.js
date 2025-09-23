@@ -115,11 +115,5 @@
 		).on("input change", function () {
 			$(document).hitungSemua(config);
 		});
-
-		// Init Select2 (jika ada)
-		$(".select2-init").select2({
-			theme: "bootstrap-5",
-			width: "100%",
-		});
 	};
 })(jQuery);

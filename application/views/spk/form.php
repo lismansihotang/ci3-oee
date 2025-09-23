@@ -8,8 +8,8 @@
     <div class="row">
         <div class="col-6">
             <?= bs_floating_input('no_spk', 'text', (isset($row) ? $row->no_spk : ''), null, 'no_spk', [], 'No. SPK'); ?>
-            <?= bs_floating_select('kd_machine', $list_machines, (isset($row) ? $row->no_spk : ''), 'kd_machine', [], 'Mesin'); ?>
-            <?= bs_floating_select('no_po', $list_po, (isset($row) ? $row->no_spk : ''), 'no_po', [], 'No. PO'); ?>
+            <?= bs_floating_select('kd_machine', $list_machines, (isset($row) ? $row->no_spk : ''), 'kd_machine', ['class' => 'select2-init'], 'Mesin'); ?>
+            <?= bs_floating_select('no_po', $list_po, (isset($row) ? $row->no_spk : ''), 'no_po', ['class' => 'select2-init'], 'No. PO'); ?>
             <div class="form-floating mb-3">
                 <input type="email" class="form-control" id="kd_product_display" value="<?= isset($row) ? $row->kd_product . ' - ' . $row->nama_produk : '-' ?>" readonly>
                 <label for="kd_product_display">Produk</label>

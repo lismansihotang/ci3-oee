@@ -3,8 +3,8 @@
 
     <div class="form-group mb-3">
         <label for="no_spk">No. SPK</label>
-        <input type="text" id="no_spk" name="no_spk" class="form-control" 
-               value="<?= isset($row) ? $row->no_spk : '' ?>">
+        <input type="text" id="no_spk" name="no_spk" class="form-control"
+            value="<?= isset($row) ? $row->no_spk : '' ?>">
     </div>
 
     <div class="form-group mb-3">
@@ -31,23 +31,23 @@
         </div>
         <div class="col-md-6 mb-3">
             <label for="kd_product">Produk</label>
-<input type="hidden" name="kd_product" id="kd_product" value="<?= isset($row) ? $row->kd_product : '' ?>">
+            <input type="hidden" name="kd_product" id="kd_product" value="<?= isset($row) ? $row->kd_product : '' ?>">
 
-<input type="text" id="kd_product_display" class="form-control" readonly
-       value="<?= isset($row) ? $row->kd_product . ' - ' . $row->nama_produk : '' ?>">
+            <input type="text" id="kd_product_display" class="form-control" readonly
+                value="<?= isset($row) ? $row->kd_product . ' - ' . $row->nama_produk : '' ?>">
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6 mb-3">
             <label for="no_mould">No. Mould</label>
-            <input type="text" id="no_mould" name="no_mould" class="form-control" 
-                   value="<?= isset($row) ? $row->no_mould : '' ?>">
+            <input type="text" id="no_mould" name="no_mould" class="form-control"
+                value="<?= isset($row) ? $row->no_mould : '' ?>">
         </div>
         <div class="col-md-6 mb-3">
             <label for="jml_ord">Jumlah Order (Pcs)</label>
-            <input type="number" id="jml_ord" name="jml_ord" class="form-control" 
-                   value="<?= isset($row) ? $row->jml_ord : '' ?>">
+            <input type="number" id="jml_ord" name="jml_ord" class="form-control"
+                value="<?= isset($row) ? $row->jml_ord : '' ?>">
         </div>
     </div>
 
@@ -56,28 +56,28 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="cavity">Cavity</label>
-                <input type="text" id="cavity" name="cavity" class="form-control" readonly 
-                       value="<?= isset($row) ? $row->cavity : '' ?>">
+                <input type="text" id="cavity" name="cavity" class="form-control" readonly
+                    value="<?= isset($row) ? $row->cavity : '' ?>">
             </div>
             <div class="col-md-6 mb-3">
                 <label for="ct">Cycle Time (Produksi)</label>
-                <input type="text" id="ct" name="ct" class="form-control" readonly 
-                       value="<?= isset($row) ? $row->ct : '' ?>">
+                <input type="text" id="ct" name="ct" class="form-control" readonly
+                    value="<?= isset($row) ? $row->ct : '' ?>">
             </div>
-          
+
         </div>
 
         <div class="row">
-            
+
             <div class="col-md-6 mb-3">
                 <label for="ct_print">Cycle Time Printing</label>
-                <input type="text" id="ct_print" name="ct_print" class="form-control" 
-                       value="<?= isset($row) ? $row->ct_print : '' ?>">
+                <input type="text" id="ct_print" name="ct_print" class="form-control"
+                    value="<?= isset($row) ? $row->ct_print : '' ?>">
             </div>
             <div class="col-md-6 mb-3">
                 <label for="ct_stamp">Cycle Time Stamping</label>
-                <input type="text" id="ct_stamp" name="ct_stamp" class="form-control" 
-                       value="<?= isset($row) ? $row->ct_stamp : '' ?>">
+                <input type="text" id="ct_stamp" name="ct_stamp" class="form-control"
+                    value="<?= isset($row) ? $row->ct_stamp : '' ?>">
             </div>
         </div>
     </fieldset>
@@ -112,13 +112,13 @@
     <div class="row">
         <div class="col-md-6 mb-3">
             <label for="tgl_mulai">Mulai Produksi</label>
-            <input type="date" id="tgl_mulai" name="tgl_mulai" class="form-control" 
-                   value="<?= isset($row) ? $row->tgl_mulai : '' ?>">
+            <input type="date" id="tgl_mulai" name="tgl_mulai" class="form-control"
+                value="<?= isset($row) ? $row->tgl_mulai : '' ?>">
         </div>
         <div class="col-md-6 mb-3">
             <label for="tgl_selesai">Selesai Produksi</label>
-            <input type="date" id="tgl_selesai" name="tgl_selesai" class="form-control" 
-                   value="<?= isset($row) ? $row->tgl_selesai : '' ?>">
+            <input type="date" id="tgl_selesai" name="tgl_selesai" class="form-control"
+                value="<?= isset($row) ? $row->tgl_selesai : '' ?>">
         </div>
     </div>
 
@@ -144,133 +144,45 @@
 <?= card_close() ?>
 
 
-
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="/assets/js/ajax-generic.js"></script>
+<script src="/assets/js/calc-spk.js"></script>
 
 <script>
-$(document).ready(function() {
-
-    $('#no_po').on('change', function() {
-        var id_po = $(this).val();
-        console.log("PO dipilih:", id_po);
-
-        if (id_po) {
-            $.ajax({
-                url: "<?= site_url('spk/get_po_detail/') ?>" + id_po,
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
-
-                    if (data) {
-                        $('#kd_product').val(data.kd_product);
-                        $('#kd_product_display').val(data.kd_product + ' - ' + data.nama_produk);
-                        $('#cavity').val(data.cavity);
-                        $('#ct').val(data.ct);
-                        $('#ct_print').val(data.ct_print);
-                        $('#ct_stamp').val(data.ct_stamp);
-                        $('#no_mould').val(data.no_mould);
-
-                        hitungTarget();
-
-                        console.log("Set ke input:", 
-                            $('#kd_product').val(),
-                            $('#cavity').val(),
-                            $('#ct').val()
-                        );
+    $(document).ready(function() {
+        // Hitung SPK
+        $(document).initSpkForm({
+            urlPoDetail: "<?= site_url('spk/get_po_detail/') ?>",
+            config: {
+                cavity: '#cavity',
+                processes: [{
+                        cycle: '#ct',
+                        prefix: 't'
+                    },
+                    {
+                        cycle: '#ct_print',
+                        prefix: 'print'
+                    },
+                    {
+                        cycle: '#ct_stamp',
+                        prefix: 'stamp'
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Ajax Error:", status, error);
-                }
-            });
-        }
+                ],
+                order: '#jml_ord',
+                startDate: '#tgl_mulai',
+                endDate: '#tgl_selesai',
+                jamPerShift: 8,
+                shiftPerHari: 3
+            }
+        });
+
+        // Init Select2
+        $(".select2-init").select2({
+            theme: "bootstrap-5",
+            width: '100%'
+        });
     });
-
-    // Hitung target produksi
-    function hitungTarget() {
-    let cavity   = parseFloat($('#cavity').val()) || 0;
-    let ct       = parseFloat($('#ct').val()) || 0;
-    let ctPrint  = parseFloat($('#ct_print').val()) || 0;
-    let ctStamp  = parseFloat($('#ct_stamp').val()) || 0;
-
-    // === Target produksi utama ===
-    if (cavity > 0 && ct > 0) {
-        let tJam   = (3600 / ct) * cavity;
-        let tShift = tJam * 8;
-        let tDay   = tShift * 3;
-
-        $('#tjam').val(Math.floor(tJam));
-        $('#tshift').val(Math.floor(tShift));
-        $('#tday').val(Math.floor(tDay));
-    }
-
-    // === Target printing ===
-    if (cavity > 0 && ctPrint > 0) {
-        let pJam   = (3600 / ctPrint) * cavity;
-        let pShift = pJam * 8;
-        let pDay   = pShift * 3;
-
-        $('#print_jam').val(Math.floor(pJam));
-        $('#print_shift').val(Math.floor(pShift));
-        $('#print_day').val(Math.floor(pDay));
-    }
-
-    // === Target stamping ===
-    if (cavity > 0 && ctStamp > 0) {
-        let sJam   = (3600 / ctStamp) * cavity;
-        let sShift = sJam * 8;
-        let sDay   = sShift * 3;
-
-        $('#stamp_jam').val(Math.floor(sJam));
-        $('#stamp_shift').val(Math.floor(sShift));
-        $('#stamp_day').val(Math.floor(sDay));
-    }
-}
-
-
-    // Hitung tanggal selesai produksi
-    function hitungTanggalSelesai() {
-        let jmlOrder = parseFloat($('#jml_ord').val()) || 0;
-        let tDay     = parseFloat($('#tday').val()) || 0;
-        let tglMulai = $('#tgl_mulai').val();
-
-        if (jmlOrder > 0 && tDay > 0 && tglMulai) {
-            let lamaHari = Math.ceil(jmlOrder / tDay);
-
-            let startDate = new Date(tglMulai);
-            startDate.setDate(startDate.getDate() + lamaHari);
-
-            let yyyy = startDate.getFullYear();
-            let mm   = String(startDate.getMonth() + 1).padStart(2, '0');
-            let dd   = String(startDate.getDate()).padStart(2, '0');
-            let hasil = yyyy + '-' + mm + '-' + dd;
-
-            $('#tgl_selesai').val(hasil);
-        }
-    }
-
-    // Trigger otomatis
-    $('#cavity, #ct').on('input change', function() {
-        hitungTarget(); 
-    });
-
-    $('#jml_ord, #tgl_mulai').on('input change', function() {
-        hitungTanggalSelesai(); 
-    });
-
-});
 </script>
-
-<script>
-$(document).ready(function() {
-    $(".select2-init").select2({
-        theme: "bootstrap-5",
-        width: '100%'
-    });
-});
-</script>
-

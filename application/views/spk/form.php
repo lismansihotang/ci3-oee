@@ -1,143 +1,84 @@
+<link rel="stylesheet" href="<?= base_url('assets/node_modules/flatpickr/dist/flatpickr.min.css') ?>">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="<?= base_url('assets/css/floating-select2.css') ?>">
+
 <?= card_open('<i class="icon cil-window"></i> Surat Perintah Kerja') ?>
 <form method="post">
-
-    <div class="form-group mb-3">
-        <label for="no_spk">No. SPK</label>
-        <input type="text" id="no_spk" name="no_spk" class="form-control"
-            value="<?= isset($row) ? $row->no_spk : '' ?>">
-    </div>
-
-    <div class="form-group mb-3">
-        <label for="kd_machine">Mesin</label>
-        <select id="kd_machine" name="kd_machine" class="form-control select2-init">
-            <?php foreach ($list_machines as $id => $machine_label): ?>
-                <option value="<?= $id ?>" <?= isset($row) && $row->kd_machine == $id ? 'selected' : '' ?>>
-                    <?= $machine_label ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-
     <div class="row">
-        <div class="col-md-6 mb-3">
-            <label for="no_po">No. PO</label>
-            <select id="no_po" name="no_po" class="form-control select2-init">
-                <?php foreach ($list_po as $po_id => $po_label): ?>
-                    <option value="<?= $po_id ?>" <?= isset($row) && $row->no_po == $po_id ? 'selected' : '' ?>>
-                        <?= $po_label ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label for="kd_product">Produk</label>
+        <div class="col-6">
+            <?= bs_floating_input('no_spk', 'text', (isset($row) ? $row->no_spk : ''), null, 'no_spk', [], 'No. SPK'); ?>
+            <?= bs_floating_select('kd_machine', $list_machines, (isset($row) ? $row->no_spk : ''), 'kd_machine', [], 'Mesin'); ?>
+            <?= bs_floating_select('no_po', $list_po, (isset($row) ? $row->no_spk : ''), 'no_po', [], 'No. PO'); ?>
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="kd_product_display" value="<?= isset($row) ? $row->kd_product . ' - ' . $row->nama_produk : '-' ?>" readonly>
+                <label for="kd_product_display">Produk</label>
+            </div>
             <input type="hidden" name="kd_product" id="kd_product" value="<?= isset($row) ? $row->kd_product : '' ?>">
-
-            <input type="text" id="kd_product_display" class="form-control" readonly
-                value="<?= isset($row) ? $row->kd_product . ' - ' . $row->nama_produk : '' ?>">
+            <?= bs_floating_input('no_mould', 'text', (isset($row) ? $row->no_mould : ''), null, 'no_mould', [], 'No. Mould'); ?>
+            <?= bs_floating_input('jml_ord', 'number', (isset($row) ? $row->jml_ord : ''), null, 'jml_ord', [], 'Jumlah Order (Pcs)'); ?>
+            <?= bs_floating_input('tgl_mulai', 'date', (isset($row) ? $row->tgl_mulai : ''), null, 'tgl_mulai', [], 'Tanggal Mulai'); ?>
+            <?= bs_floating_input('tgl_selesai', 'date', (isset($row) ? $row->tgl_selesai : ''), null, 'tgl_selesai', [], 'Tanggal Selesai'); ?>
+            <?= bs_floating_textarea('keterangan', (isset($row) ? $row->keterangan : ''), null, 'keterangan', null, 'Keterangan'); ?>
+            <?= bs_floating_select('status', ['open' => 'Aktif', 'closed' => 'Selesai'], (isset($row) ? $row->status : ''), 'status', [], 'Status'); ?>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label for="no_mould">No. Mould</label>
-            <input type="text" id="no_mould" name="no_mould" class="form-control"
-                value="<?= isset($row) ? $row->no_mould : '' ?>">
-        </div>
-        <div class="col-md-6 mb-3">
-            <label for="jml_ord">Jumlah Order (Pcs)</label>
-            <input type="number" id="jml_ord" name="jml_ord" class="form-control"
-                value="<?= isset($row) ? $row->jml_ord : '' ?>">
-        </div>
-    </div>
-
-    <fieldset class="border p-3 mb-3">
-        <legend class="w-auto px-2">Detail Produksi</legend>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="cavity">Cavity</label>
-                <input type="text" id="cavity" name="cavity" class="form-control" readonly
-                    value="<?= isset($row) ? $row->cavity : '' ?>">
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="ct">Cycle Time (Produksi)</label>
-                <input type="text" id="ct" name="ct" class="form-control" readonly
-                    value="<?= isset($row) ? $row->ct : '' ?>">
+        <div class="col-6">
+            <?= card_open('<i class="icon cil-settings"></i> Detail Produksi', ['class' => 'border-info']) ?>
+            <?= bs_floating_input('cavity', 'text', (isset($row) ? $row->cavity : ''), null, null, [], 'Cavity'); ?>
+            <?= bs_floating_input('ct', 'text', (isset($row) ? $row->ct : ''), null, null, [], 'Cycle Time (Produksi)'); ?>
+            <?= bs_floating_input('ct_print', 'text', (isset($row) ? $row->ct_print : ''), null, null, [], 'Cycle Time (Printing)'); ?>
+            <?= bs_floating_input('ct_stamp', 'text', (isset($row) ? $row->ct_stamp : ''), null, null, [], 'Cycle Time (Stamping)'); ?>
+            <?= card_close() ?>
+            <?= card_open('<i class="icon cil-settings"></i> Target Produksi', ['class' => 'border-primary']) ?>
+            <p class="mt-1 mb-0">T/Jam</p>
+            <div class="row">
+                <div class="col-4">
+                    <?= bs_floating_input('tjam', 'number', (isset($row) ? $row->tjam : ''), null, 'tjam', [], 'Produksi'); ?>
+                </div>
+                <div class="col-4">
+                    <?= bs_floating_input('print_jam', 'number', (isset($row) ? $row->printjam : ''), null, 'print_jam', [], 'Printing'); ?>
+                </div>
+                <div class="col-4">
+                    <?= bs_floating_input('stamp_jam', 'number', (isset($row) ? $row->stampjam : ''), null, 'stamp_jam', [], 'Stamping'); ?>
+                </div>
             </div>
 
-        </div>
-
-        <div class="row">
-
-            <div class="col-md-6 mb-3">
-                <label for="ct_print">Cycle Time Printing</label>
-                <input type="text" id="ct_print" name="ct_print" class="form-control"
-                    value="<?= isset($row) ? $row->ct_print : '' ?>">
+            <p class="mt-1 mb-0">T/Shift</p>
+            <div class="row">
+                <div class="col-4">
+                    <?= bs_floating_input('tshift', 'number', (isset($row) ? $row->tshift : ''), null, 'tshift', [], 'Produksi'); ?>
+                </div>
+                <div class="col-4">
+                    <?= bs_floating_input('print_shift', 'number', (isset($row) ? $row->printshift : ''), null, 'print_shift', [], 'Printing'); ?>
+                </div>
+                <div class="col-4">
+                    <?= bs_floating_input('stamp_shift', 'number', (isset($row) ? $row->stampshift : ''), null, 'stamp_shift', [], 'Stamping'); ?>
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <label for="ct_stamp">Cycle Time Stamping</label>
-                <input type="text" id="ct_stamp" name="ct_stamp" class="form-control"
-                    value="<?= isset($row) ? $row->ct_stamp : '' ?>">
+
+            <p class="mt-1 mb-0">T/Day</p>
+            <div class="row">
+                <div class="col-4">
+                    <?= bs_floating_input('tday', 'number', (isset($row) ? $row->tday : ''), null, 'tday', [], 'Produksi'); ?>
+                </div>
+                <div class="col-4">
+                    <?= bs_floating_input('print_day', 'number', (isset($row) ? $row->printday : ''), null, 'print_day', [], 'Printing'); ?>
+                </div>
+                <div class="col-4">
+                    <?= bs_floating_input('stamp_day', 'number', (isset($row) ? $row->stampday : ''), null, 'stamp_day', [], 'Stamping'); ?>
+                </div>
             </div>
-        </div>
-    </fieldset>
-    <fieldset class="border p-3 mb-3">
-        <legend class="w-auto px-2">Target Produksi</legend>
-        <div class="row text-center fw-bold">
-            <div class="col-md-4">Produksi</div>
-            <div class="col-md-4">Printing</div>
-            <div class="col-md-4">Stamping</div>
-        </div>
 
-        <div class="row align-items-center mb-2">
-            <div class="col-md-2"><label>T/Jam</label></div>
-            <div class="col-md-3"><input type="number" name="tjam" id="tjam" value="<?= isset($row) ? $row->tjam : '' ?>" class="form-control"></div>
-            <div class="col-md-3"><input type="number" name="print_jam" id="print_jam" value="<?= isset($row) ? $row->print_jam : '' ?>" class="form-control"></div>
-            <div class="col-md-3"><input type="number" name="stamp_jam" id="stamp_jam" value="<?= isset($row) ? $row->stamp_jam : '' ?>" class="form-control"></div>
-        </div>
-        <div class="row align-items-center mb-2">
-            <div class="col-md-2"><label>T/Shift</label></div>
-            <div class="col-md-3"><input type="number" name="tshift" id="tshift" value="<?= isset($row) ? $row->tshift : '' ?>" class="form-control"></div>
-            <div class="col-md-3"><input type="number" name="print_shift" id="print_shift" value="<?= isset($row) ? $row->print_shift : '' ?>" class="form-control"></div>
-            <div class="col-md-3"><input type="number" name="stamp_shift" id="stamp_shift" value="<?= isset($row) ? $row->stamp_shift : '' ?>" class="form-control"></div>
-        </div>
-        <div class="row align-items-center mb-2">
-            <div class="col-md-2"><label>T/Day</label></div>
-            <div class="col-md-3"><input type="number" name="tday" id="tday" value="<?= isset($row) ? $row->tday : '' ?>" class="form-control"></div>
-            <div class="col-md-3"><input type="number" name="print_day" id="print_day" value="<?= isset($row) ? $row->print_day : '' ?>" class="form-control"></div>
-            <div class="col-md-3"><input type="number" name="stamp_day" id="stamp_day" value="<?= isset($row) ? $row->stamp_day : '' ?>" class="form-control"></div>
-        </div>
-
-    </fieldset>
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label for="tgl_mulai">Mulai Produksi</label>
-            <input type="date" id="tgl_mulai" name="tgl_mulai" class="form-control"
-                value="<?= isset($row) ? $row->tgl_mulai : '' ?>">
-        </div>
-        <div class="col-md-6 mb-3">
-            <label for="tgl_selesai">Selesai Produksi</label>
-            <input type="date" id="tgl_selesai" name="tgl_selesai" class="form-control"
-                value="<?= isset($row) ? $row->tgl_selesai : '' ?>">
+            <?= card_close() ?>
         </div>
     </div>
 
-    <div class="form-group mb-3">
-        <label for="keterangan">Keterangan</label>
-        <textarea id="keterangan" name="keterangan" class="form-control"><?= isset($row) ? $row->keterangan : '' ?></textarea>
-    </div>
-
-    <div class="form-group mb-3">
-        <label for="status">Status</label>
-        <select id="status" name="status" class="form-control">
-            <option value="open" <?= isset($row) && $row->status == 'open' ? 'selected' : '' ?>>Aktif</option>
-            <option value="closed" <?= isset($row) && $row->status == 'closed' ? 'selected' : '' ?>>Selesai</option>
-        </select>
-    </div>
-
-    <div class="d-flex justify-content-between">
-        <button type="submit" class="btn btn-success">Simpan</button>
-        <button type="reset" class="btn btn-secondary">Batal</button>
+    <div class="mt-3">
+        <div class="btn-group" role="group" aria-label="FormCreateUpdate">
+            <button type="submit" class="btn btn-success" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Simpan Data Sekarang"><i class="icon cil-save"></i> Simpan</button>
+            <a href="<?= site_url('spk') ?>" class="btn btn-secondary" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke List Data"><i class="icon cil-reload"></i> Kembali</a>
+            <a href="<?= site_url('/') ?>" class="btn btn-outline-dark" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke Halaman Utama"><i class="icon cil-home"></i></a>
+        </div>
     </div>
 
 </form>
@@ -148,8 +89,10 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="/assets/js/ajax-generic.js"></script>
-<script src="/assets/js/calc-spk.js"></script>
+<script src="<?= base_url('assets/node_modules/flatpickr/dist/flatpickr.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/flatpickr_config.js') ?>"></script>
+<script src="<?= base_url('assets/js/ajax-generic.js') ?>"></script>
+<script src="<?= base_url('assets/js/calc-spk.js') ?>"></script>
 
 <script>
     $(document).ready(function() {

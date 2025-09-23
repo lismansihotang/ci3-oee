@@ -11,10 +11,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * @param string|null $placeholder Teks placeholder untuk input.
  * @param string|null $id ID unik untuk input.
  * @param array $extra_attributes Array asosiatif berisi atribut tambahan seperti ['data-coreui-datepicker' => 'true'].
+ * @param string|null $label Label custom (jika null, otomatis dari $name).
  * @return string Kode HTML untuk input form.
  */
 if (! function_exists('bs_floating_input')) {
-    function bs_floating_input($name, $type = 'text', $value = null, $placeholder = null, $id = null, $extra_attributes = [])
+    function bs_floating_input($name, $type = 'text', $value = null, $placeholder = null, $id = null, $extra_attributes = [], $label = null)
     {
         $id = $id ?? $name . '_' . uniqid();
         $placeholder = $placeholder ?? "Entry Data " . ucfirst(str_replace('_', ' ', $name));
@@ -33,9 +34,12 @@ if (! function_exists('bs_floating_input')) {
         // Tangani nilai null atau string kosong dengan hati-hati
         $input_value = ($value !== null && $value !== '') ? html_escape($value) : '';
 
+        // Gunakan label custom jika ada, fallback ke default
+        $label_text = $label ?? strtoupper(str_replace('_', ' ', $name));
+
         $html = '<div class="form-floating mb-2">';
         $html .= '<input type="' . html_escape($type) . '" ' . $class_string . ' id="' . html_escape($id) . '" name="' . html_escape($name) . '" placeholder="' . html_escape($placeholder)  . '" value="' . $input_value . '"' . $attr_string . '>';
-        $html .= '<label for="' . html_escape($id) . '">' . html_escape(strtoupper(str_replace('_', ' ', $name))) . '</label>';
+        $html .= '<label for="' . html_escape($id) . '">' . html_escape($label_text) . '</label>';
         $html .= '</div>';
 
         return $html;
@@ -50,18 +54,21 @@ if (! function_exists('bs_floating_input')) {
  * @param string|null $placeholder Teks placeholder untuk textarea.
  * @param string|null $id ID unik untuk textarea.
  * @param string|null $style Atribut style tambahan untuk textarea (misalnya 'height: 100px').
+ * @param string|null $label Label custom (jika null, otomatis dari $name).
  * @return string Kode HTML untuk textarea form.
  */
 if (! function_exists('bs_floating_textarea')) {
-    function bs_floating_textarea($name, $value = null, $placeholder = null, $id = null, $style = null)
+    function bs_floating_textarea($name, $value = null, $placeholder = null, $id = null, $style = null, $label = null)
     {
         $id = $id ?? $name . '_' . uniqid();
         $placeholder = $placeholder ?? "Entry Data " . ucfirst(str_replace('_', ' ', $name));
         $style_attr = !empty($style) ? ' style="' . $style . '"' : '';
+        // Gunakan label custom jika ada, fallback ke default
+        $label_text = $label ?? strtoupper(str_replace('_', ' ', $name));
 
         $html = '<div class="form-floating mb-2">';
         $html .= '<textarea class="form-control" id="' . html_escape($id) . '" name="' . html_escape($name) . '" placeholder="' . html_escape($placeholder)  . '"' . $style_attr . '>' . html_escape($value ?? '') . '</textarea>';
-        $html .= '<label for="' . html_escape($id) . '">' . html_escape(strtoupper(str_replace('_', ' ', $name))) . '</label>';
+        $html .= '<label for="' . html_escape($id) . '">' . html_escape($label_text) . '</label>';
         $html .= '</div>';
 
         return $html;
@@ -76,10 +83,11 @@ if (! function_exists('bs_floating_textarea')) {
  * @param string|null $selected_value Nilai yang akan dipilih secara default.
  * @param string|null $id ID unik untuk select.
  * @param array $extra_attributes Array asosiatif berisi atribut tambahan seperti ['data-target-input' => 'nm_cust'].
+ * @param string|null $label Label custom (jika null, otomatis dari $name).
  * @return string Kode HTML untuk select form.
  */
 if (! function_exists('bs_floating_select')) {
-    function bs_floating_select($name, $options = [], $selected_value = null, $id = null, $extra_attributes = [])
+    function bs_floating_select($name, $options = [], $selected_value = null, $id = null, $extra_attributes = [], $label = null)
     {
         $id = $id ?? $name . '_' . uniqid();
 
@@ -96,6 +104,9 @@ if (! function_exists('bs_floating_select')) {
             $attr_string .= " " . html_escape($key) . "=\"" . html_escape($val) . "\"";
         }
 
+        // Gunakan label custom jika ada, fallback ke default
+        $label_text = $label ?? strtoupper(str_replace('_', ' ', $name));
+
         $html = '<div class="form-floating mb-2">';
         $html .= '<select ' . $class_attr . ' id="' . html_escape($id) . '" name="' . html_escape($name) . '" aria-label="Floating label select example"' . $attr_string . '>';
 
@@ -105,7 +116,7 @@ if (! function_exists('bs_floating_select')) {
         }
 
         $html .= '</select>';
-        $html .= '<label for="' . html_escape($id) . '">' . html_escape(strtoupper(str_replace('_', ' ', $name))) . '</label>';
+        $html .= '<label for="' . html_escape($id) . '">' . html_escape($label_text) . '</label>';
         $html .= '</div>';
 
         return $html;

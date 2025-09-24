@@ -76,7 +76,8 @@ class Prod_utama extends MY_Controller
             $data = [
                 'per_jam'   => $spk->tjam,
                 'per_shift' => $spk->tshift,
-                'per_day'   => $spk->tday
+                'per_day'   => $spk->tday,
+                'ct'   => $spk->ct,
             ];
         } else {
             $data = [

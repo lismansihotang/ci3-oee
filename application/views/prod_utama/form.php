@@ -38,15 +38,16 @@
     <div class="tab-content mt-3">
         <div class="tab-pane fade show active" id="tab-produksi" role="tabpanel">
             <?php
-            $headers = ['Jam', 'Pass', 'Finish', 'Hold', 'Reject'];
-            $columns = ['jam', 'pass', 'finish', 'hold', 'reject_btn'];
+            $headers = ['Jam', 'Pass',   'Reject','Hold'];
+            $columns = ['jam', 'pass',  'reject_btn','hold'];
 
             $column_types = [
                 'jam' => 'time',
                 'pass' => 'number',
-                'finish' => 'number',
-                'hold' => 'number',
-                'reject_btn' => 'button'
+                //'finish' => 'number',
+                'reject_btn' => 'button',
+                'hold' => 'number'
+                
             ];
 
             $column_attributes = [
@@ -92,11 +93,44 @@
             <button type="submit" class="btn btn-success"><i class="icon cil-save"></i> Simpan</button>
             <a href="<?= site_url('produksi') ?>" class="btn btn-secondary"><i class="icon cil-reload"></i> Kembali</a>
         </div>
-        <button type="button" class="btn btn-warning float-end">End Shift</button>
+        <!-- <button type="button" class="btn btn-warning float-end">End Shift</button> -->
     </div>
 
 </form>
 <?= card_close() ?>
+<!-- Modal Reject -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="form-reject">
+        <div class="modal-header">
+          <h5 class="modal-title" id="rejectModalLabel">Tambah Reject</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered" id="rejectTable">
+            <thead>
+              <tr>
+                <th>Jenis Reject</th>
+                <th>Qty</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- baris akan ditambahkan lewat JS -->
+            </tbody>
+          </table>
+          <button type="button" class="btn btn-sm btn-primary" id="addRejectRow">+ Tambah Baris</button>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Simpan Reject</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -151,15 +185,7 @@
                 name: "pass",
                 type: "number"
             },
-            {
-                name: "finish",
-                type: "number"
-            },
-            {
-                name: "hold",
-                type: "number"
-            },
-            {
+           {
                 name: "reject_btn",
                 type: "button",
                 text: "+ Tambah Reject",
@@ -170,27 +196,45 @@
                 }
             },
             {
-                name: "remove_btn",
+                name: "hold",
+                type: "number"
+            },
+             {
+                name: "save_btn",
                 type: "button",
-                text: "<i class=\"icon cil-minus\"></i>",
-                class: "btn btn-danger btn-sm remove-row-btn",
+                text: "<i class='icon cil-save'></i> ",
+                class: "btn btn-success btn-sm save-row-btn",
                 attrs: {}
-            }
+            },
+            {
+                name: "edit_btn",
+                type: "button",
+                text: "<i class='icon cil-pencil'></i> ",
+                class: "btn btn-warning btn-sm edit-row-btn",
+                attrs: {}
+            },
+            // {
+            //     name: "remove_btn",
+            //     type: "button",
+            //     text: "<i class=\"icon cil-minus\"></i>",
+            //     class: "btn btn-danger btn-sm remove-row-btn",
+            //     attrs: {}
+            // }
         ];
 
         // Custom shiftConfig (opsional, override default)
         const customShiftConfig = {
             "1": {
-                start: 7,
-                end: 15
+                start: 8,
+                end: 16
             }, // contoh: 07:00–15:00
             "2": {
-                start: 15,
-                end: 23
+                start: 16,
+                end: 24
             }, // contoh: 15:00–23:00
             "3": {
-                start: 23,
-                end: 7
+                start: 24,
+                end: 8
             } // contoh: 23:00–07:00 (perlu handle span midnight)
         };
 
@@ -215,4 +259,74 @@
             });
         }
     });
+    $(document).ready(function() {
+    $("#addRejectRow").on("click", function() {
+        let row = `
+            <tr>
+                <td>
+                    <select name="jenis_reject[]" class="form-select">
+                        <option value="Bentuk">Bentuk</option>
+                        <option value="Warna">Warna</option>
+                        <option value="Cacat">Cacat</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="qty_reject[]" class="form-control" min="1" value="1">
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-reject-row">Hapus</button>
+                </td>
+            </tr>
+        `;
+        $("#rejectTable tbody").append(row);
+    });
+
+    $(document).on("click", ".remove-reject-row", function() {
+        $(this).closest("tr").remove();
+    });
+
+    $("#form-reject").on("submit", function(e) {
+        e.preventDefault();
+
+        let rejects = [];
+        $("#rejectTable tbody tr").each(function() {
+            let jenis = $(this).find("select[name='jenis_reject[]']").val();
+            let qty   = $(this).find("input[name='qty_reject[]']").val();
+            rejects.push({ jenis: jenis, qty: qty });
+        });
+
+        console.log("Rejects:", rejects);
+
+        alert("Data reject berhasil ditambahkan");
+
+        $("#rejectModal").modal("hide");
+    });
+});
+$("#form-reject").on("submit", function(e) {
+    e.preventDefault();
+
+    let rejects = [];
+    let totalReject = 0;
+
+    $("#rejectTable tbody tr").each(function() {
+        let jenis = $(this).find("select[name='jenis_reject[]']").val();
+        let qty   = parseInt($(this).find("input[name='qty_reject[]']").val() || 0);
+        rejects.push({ jenis: jenis, qty: qty });
+        totalReject += qty;
+    });
+
+    if (currentRow) {
+        // Simpan data ke row (pakai attribute data)
+        currentRow.data("reject", rejects);
+
+        // Update tombol → jadi "Detail Reject"
+        currentRow.find(".btn-reject")
+            .removeClass("btn-primary")
+            .addClass("btn-info")
+            .text("Detail Reject (" + totalReject + ")");
+    }
+
+    $("#rejectModal").modal("hide");
+});
+
 </script>

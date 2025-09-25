@@ -6,21 +6,12 @@
         <td><?= $row->id ?></td>
     </tr>
     <tr>
-        <th>prod_id</th>
-        <td><?= $row->prod_id ?></td>
-    </tr>
-    <tr>
-        <th>kd_ms</th>
-        <td><?= $row->kd_ms ?></td>
-
+        <th>shift_id</th>
+        <td><?= $row->shift_id ?></td>
     </tr>
     <tr>
         <th>downtime_id</th>
         <td><?= $row->downtime_id ?></td>
-    </tr>
-    <tr>
-        <th>tanggal</th>
-        <td><?= $row->tanggal ?></td>
     </tr>
     <tr>
         <th>start_time</th>
@@ -35,16 +26,8 @@
         <td><?= $row->duration_min ?></td>
     </tr>
     <tr>
-        <th>shift</th>
-        <td><?= $row->shift ?></td>
-    </tr>
-    <tr>
         <th>notes</th>
         <td><?= $row->notes ?></td>
-    </tr>
-    <tr>
-        <th>action</th>
-        <td><?= $row->action ?></td>
     </tr>
     <tr>
         <th>is_deleted</th>

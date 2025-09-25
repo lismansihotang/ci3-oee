@@ -12,7 +12,7 @@ class Prod_reject extends MY_Controller
         $this->load->model('Prod_reject_model','model');
         $this->controller_name = 'prod_reject';
         $this->model->set_group_by([]);
-        $this->model->set_order_by();
+        $this->model->set_order_by('id');
     }
 
     public function index($view = '')

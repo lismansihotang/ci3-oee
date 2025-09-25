@@ -7,22 +7,19 @@
     ]) ?>
     <?= build_table([
         'headers' => array (
-
-        // 'id' => 'Id',
-        'prod_id' => 'Prod ID',
-        'jam_mulai' => 'Start Time',
-        'jam_selesai' => 'End Time',
-        'pass_qty' => 'Jumlah Pass',
-        // 'finish_qty' => 'Finish_qty',
-        // 'is_deleted' => 'Is_deleted',
-        // 'created_by' => 'Created_by',
-        // 'updated_by' => 'Updated_by',
-        // 'deleted_by' => 'Deleted_by',
-        // 'created_at' => 'Created_at',
-        // 'updated_at' => 'Updated_at',
-        // 'deleted_at' => 'Deleted_at',
-        ),
-
+  'id' => 'Id',
+  'shift_id' => 'Shift_id',
+  'pass_qty' => 'Pass_qty',
+  'is_deleted' => 'Is_deleted',
+  'created_by' => 'Created_by',
+  'updated_by' => 'Updated_by',
+  'deleted_by' => 'Deleted_by',
+  'created_at' => 'Created_at',
+  'updated_at' => 'Updated_at',
+  'deleted_at' => 'Deleted_at',
+  'jam' => 'Jam',
+  'hold_qty' => 'Hold_qty',
+),
         'rows' => $rows,
         'actions' => [
             'view' => 'prod_detail/view',

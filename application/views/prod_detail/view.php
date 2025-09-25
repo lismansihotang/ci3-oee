@@ -6,24 +6,12 @@
         <td><?= $row->id ?></td>
     </tr>
     <tr>
-        <th>prod_id</th>
-        <td><?= $row->prod_id ?></td>
-    </tr>
-    <tr>
-        <th>jam_mulai</th>
-        <td><?= $row->jam_mulai ?></td>
-    </tr>
-    <tr>
-        <th>jam_selesai</th>
-        <td><?= $row->jam_selesai ?></td>
+        <th>shift_id</th>
+        <td><?= $row->shift_id ?></td>
     </tr>
     <tr>
         <th>pass_qty</th>
         <td><?= $row->pass_qty ?></td>
-    </tr>
-    <tr>
-        <th>finish_qty</th>
-        <td><?= $row->finish_qty ?></td>
     </tr>
     <tr>
         <th>is_deleted</th>
@@ -52,6 +40,14 @@
     <tr>
         <th>deleted_at</th>
         <td><?= $row->deleted_at ?></td>
+    </tr>
+    <tr>
+        <th>jam</th>
+        <td><?= $row->jam ?></td>
+    </tr>
+    <tr>
+        <th>hold_qty</th>
+        <td><?= $row->hold_qty ?></td>
     </tr>
     </table>
     <div class="mt-3">

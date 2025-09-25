@@ -13,14 +13,39 @@
     <?= bs_floating_select('no_spk', $spk_options, (isset($row) ? $row->no_spk : ''), 'no_spk', ['class' => 'select2-init']); ?>
 
     <hr>
-    <div id="spk-target" class="mb-3" style="display:none;">
-        <h5>Target SPK</h5>
-        <ul>
-            <li>Per Jam: <span id="target-per-jam"></span></li>
-            <li>Per Shift: <span id="target-per-shift"></span></li>
-            <li>Per Hari: <span id="target-per-day"></span></li>
+<div class="row">
+  <div class="col-md-6">
+    <div id="spk-target" class="card border-primary mb-3" style="display:none;">
+      <div class="card-header bg-primary text-white">🎯 Target SPK</div>
+      <div class="card-body">
+        <ul class="mb-0">
+          <li>Per Jam: <span id="target-per-jam"></span></li>
+          <li>Per Shift: <span id="target-per-shift"></span></li>
+          <li>Per Hari: <span id="target-per-day"></span></li>
         </ul>
+      </div>
     </div>
+  </div>
+
+  <div class="col-md-6">
+    <div id="spk-summary" class="card border-success mb-3" style="display:none;">
+      <div class="card-header bg-success text-white">📊 Hasil Produksi (Shift)</div>
+      <div class="card-body">
+        <ul class="mb-0">
+          <li>Total Pass (Aktual): <span id="sum-pass">0</span></li>
+          <li>Total Reject: <span id="sum-reject">0</span></li>
+          <li>Total Hold: <span id="sum-hold">0</span></li>
+          <li>Persentase Pencapaian: <span id="sum-percent">0%</span></li>
+          <li>Persentase Reject: <span id="sum-reject-percent">0%</span></li>
+          <li>Persentase Downtime: <span id="sum-downtime-percent">0%</span></li>
+
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 
     <!-- Nav tabs -->
@@ -38,15 +63,16 @@
     <div class="tab-content mt-3">
         <div class="tab-pane fade show active" id="tab-produksi" role="tabpanel">
             <?php
-            $headers = ['Jam', 'Pass',   'Reject','Hold'];
-            $columns = ['jam', 'pass',  'reject_btn','hold'];
+            $headers = ['Jam', 'Pass',   'Reject','Hold', 'Aksi'];
+            $columns = ['jam', 'pass',  'reject_btn','hold', 'save_btn'];
 
             $column_types = [
                 'jam' => 'time',
                 'pass' => 'number',
                 //'finish' => 'number',
                 'reject_btn' => 'button',
-                'hold' => 'number'
+                'hold' => 'number',
+                'save_btn' => 'button'
                 
             ];
 
@@ -67,15 +93,23 @@
 
         <div class="tab-pane fade" id="tab-downtime" role="tabpanel">
             <?php
-            $headers = ['Jam Mulai', 'Jam Selesai', 'Jenis', 'Keterangan', 'Aksi'];
-            $columns = ['jam_mulai', 'jam_selesai', 'jenis', 'keterangan', 'action'];
+           $headers = ['Jam Mulai', 'Jam Selesai', 'Jenis', 'Keterangan', 'Perbaikan', 'Aksi'];
+            $columns = ['jam_mulai', 'jam_selesai', 'jenis', 'keterangan', 'action', 'save_btn'];
 
             $column_types = [
                 'jam_mulai' => 'time',
                 'jam_selesai' => 'time',
                 'jenis' => 'select2',
                 'keterangan' => 'text',
-                'action' => 'text'
+                'action' => 'text',
+                'save_btn' => 'button'
+            ];
+
+            $column_attributes = [
+                'save_btn' => [
+                    'class' => 'btn btn-sm btn-success save-downtime',
+                    'value' => '<i class="icon cil-save"></i>'
+                ]
             ];
 
             $select_options = [
@@ -83,7 +117,8 @@
             ];
 
             $details = isset($downtime_details) ? $downtime_details : [];
-            echo table_form_detail_generic('downtimeTable', $headers, $columns, $details, $column_types, $select_options);
+            echo table_form_detail_generic('downtimeTable', $headers, $columns, $details, $column_types, $select_options, $column_attributes);
+
             ?>
         </div>
     </div>
@@ -117,7 +152,6 @@
               </tr>
             </thead>
             <tbody>
-              <!-- baris akan ditambahkan lewat JS -->
             </tbody>
           </table>
           <button type="button" class="btn btn-sm btn-primary" id="addRejectRow">+ Tambah Baris</button>
@@ -148,15 +182,19 @@
 
 
 <script>
-    $(document).ready(function() {
+    let shiftData = {};   // simpan ringkasan per shift
+    let currentRow = null;
+
+    $(document).ready(function () {
         if ($("#prodDetailTable").length) $("#prodDetailTable").gridHelper();
         if ($("#downtimeTable").length) $("#downtimeTable").gridHelper();
 
-        $('#no_spk').change(function() {
+        // === Target SPK ===
+        $('#no_spk').change(function () {
             var id_spk = $(this).val();
             if (id_spk) {
                 ajaxRequest('<?= site_url("prod_utama/get_spk_target") ?>/' + id_spk, {
-                    onSuccess: function(data) {
+                    onSuccess: function (data) {
                         if (data) {
                             $('#spk-target').show();
                             $('#target-per-jam').text(data.per_jam);
@@ -170,85 +208,65 @@
             }
         });
 
-        // Init Select2
+        // === Select2 ===
         $(".select2-init").select2({
             theme: "bootstrap-5",
             width: '100%'
         });
 
-        // Konfigurasi kolom untuk tabel produksi
-        const prodColumns = [{
-                name: "jam",
-                type: "time"
-            },
+        // === Konfigurasi kolom produksi ===
+        const prodColumns = [
+            { name: "jam", type: "time" },
+            { name: "pass", type: "number" },
             {
-                name: "pass",
-                type: "number"
-            },
-           {
                 name: "reject_btn",
                 type: "button",
                 text: "+ Tambah Reject",
                 class: "btn btn-sm btn-primary btn-reject",
-                attrs: {
-                    "data-bs-toggle": "modal",
-                    "data-bs-target": "#rejectModal"
-                }
+                attrs: { "data-bs-toggle": "modal", "data-bs-target": "#rejectModal" }
             },
+            { name: "hold", type: "number" },
             {
-                name: "hold",
-                type: "number"
-            },
-             {
                 name: "save_btn",
                 type: "button",
-                text: "<i class='icon cil-save'></i> ",
+                text: "<i class='icon cil-save'></i>",
                 class: "btn btn-success btn-sm save-row-btn",
                 attrs: {}
             },
-            {
-                name: "edit_btn",
-                type: "button",
-                text: "<i class='icon cil-pencil'></i> ",
-                class: "btn btn-warning btn-sm edit-row-btn",
-                attrs: {}
-            },
             // {
-            //     name: "remove_btn",
+            //     name: "edit_btn",
             //     type: "button",
-            //     text: "<i class=\"icon cil-minus\"></i>",
-            //     class: "btn btn-danger btn-sm remove-row-btn",
+            //     text: "<i class='icon cil-pencil'></i>",
+            //     class: "btn btn-warning btn-sm edit-row-btn",
             //     attrs: {}
             // }
         ];
 
-        // Custom shiftConfig (opsional, override default)
+        // === Config shift ===
         const customShiftConfig = {
-            "1": {
-                start: 8,
-                end: 16
-            }, // contoh: 07:00–15:00
-            "2": {
-                start: 16,
-                end: 24
-            }, // contoh: 15:00–23:00
-            "3": {
-                start: 24,
-                end: 8
-            } // contoh: 23:00–07:00 (perlu handle span midnight)
+            "1": { start: 8, end: 16 },
+            "2": { start: 16, end: 24 },
+            "3": { start: 0, end: 8 }
         };
 
-        // Binding shift → generate row tabel
-        $(document).on('change keyup', '#shift', function() {
+        // === Ganti Shift ===
+        $(document).on('change', '#shift', function () {
+            let shiftVal = $(this).val();
+
+            saveShiftSummary(); // simpan dulu ringkasan shift lama
+
+            // generate tabel sesuai shift
             $("#prodDetailTable").generateShiftRows({
-                shift: $(this).val(),
+                shift: shiftVal,
                 columns: prodColumns,
                 shiftConfig: customShiftConfig,
                 force24h: true
             });
+
+            loadShiftSummary(shiftVal); // tampilkan ringkasan shift terpilih
         });
 
-        // Init default shift (edit mode)
+        // === Init default shift (edit mode) ===
         const defaultShift = $("#shift").val();
         if (defaultShift) {
             $("#prodDetailTable").generateShiftRows({
@@ -259,8 +277,9 @@
             });
         }
     });
-    $(document).ready(function() {
-    $("#addRejectRow").on("click", function() {
+
+    // === Reject Modal ===
+    $("#addRejectRow").on("click", function () {
         let row = `
             <tr>
                 <td>
@@ -276,57 +295,164 @@
                 <td>
                     <button type="button" class="btn btn-danger btn-sm remove-reject-row">Hapus</button>
                 </td>
-            </tr>
-        `;
+            </tr>`;
         $("#rejectTable tbody").append(row);
     });
 
-    $(document).on("click", ".remove-reject-row", function() {
+    $(document).on("click", ".remove-reject-row", function () {
         $(this).closest("tr").remove();
     });
 
-    $("#form-reject").on("submit", function(e) {
+    $(document).on("click", ".btn-reject", function () {
+        currentRow = $(this).closest("tr");
+    });
+
+    $("#form-reject").on("submit", function (e) {
         e.preventDefault();
 
         let rejects = [];
-        $("#rejectTable tbody tr").each(function() {
+        let totalReject = 0;
+
+        $("#rejectTable tbody tr").each(function () {
             let jenis = $(this).find("select[name='jenis_reject[]']").val();
-            let qty   = $(this).find("input[name='qty_reject[]']").val();
+            let qty = parseInt($(this).find("input[name='qty_reject[]']").val() || 0);
             rejects.push({ jenis: jenis, qty: qty });
+            totalReject += qty;
         });
 
-        console.log("Rejects:", rejects);
-
-        alert("Data reject berhasil ditambahkan");
+        if (currentRow) {
+            currentRow.data("reject", rejects);
+            currentRow.find(".btn-reject")
+                .removeClass("btn-primary")
+                .addClass("btn-info")
+                .text("Detail Reject (" + totalReject + ")");
+        }
 
         $("#rejectModal").modal("hide");
-    });
-});
-$("#form-reject").on("submit", function(e) {
-    e.preventDefault();
 
-    let rejects = [];
-    let totalReject = 0;
-
-    $("#rejectTable tbody tr").each(function() {
-        let jenis = $(this).find("select[name='jenis_reject[]']").val();
-        let qty   = parseInt($(this).find("input[name='qty_reject[]']").val() || 0);
-        rejects.push({ jenis: jenis, qty: qty });
-        totalReject += qty;
+        updateSummary();
     });
 
-    if (currentRow) {
-        // Simpan data ke row (pakai attribute data)
-        currentRow.data("reject", rejects);
+    // === Hitung Ringkasan ===
+   function updateSummary() {
+    let totalPass = 0, totalReject = 0, totalHold = 0, totalDowntime = 0;
 
-        // Update tombol → jadi "Detail Reject"
-        currentRow.find(".btn-reject")
-            .removeClass("btn-primary")
-            .addClass("btn-info")
-            .text("Detail Reject (" + totalReject + ")");
+    // === Hitung Produksi ===
+    $("#prodDetailTable tbody tr").each(function () {
+        let pass = parseInt($(this).find("input[name*='pass']").val() || 0);
+        let hold = parseInt($(this).find("input[name*='hold']").val() || 0);
+
+        let rejects = $(this).data("reject") || [];
+        let rejectSum = 0;
+        rejects.forEach(r => rejectSum += parseInt(r.qty || 0));
+
+        totalPass += pass;
+        totalReject += rejectSum;
+        totalHold += hold;
+    });
+
+    // === Hitung Downtime ===
+    $("#downtimeTable tbody tr").each(function () {
+        let start = $(this).find("input[name*='jam_mulai']").val();
+        let end   = $(this).find("input[name*='jam_selesai']").val();
+
+        if (start && end) {
+            let startTime = new Date("1970-01-01T" + start + ":00");
+            let endTime   = new Date("1970-01-01T" + end + ":00");
+
+            let diffMs = endTime - startTime;
+            if (diffMs > 0) {
+                totalDowntime += diffMs / (1000 * 60); // menit
+            }
+        }
+    });
+
+    // === Target Shift (produksi) ===
+    let targetShift = parseInt($("#target-per-shift").text() || 0);
+    let percent = targetShift > 0 ? ((totalPass / targetShift) * 100).toFixed(1) : 0;
+    let rejectPercent = targetShift > 0 
+        ? ((totalReject / targetShift) * 100).toFixed(1) 
+        : 0;
+
+    // === Persentase Downtime ===
+    let shiftVal = $("#shift").val();
+    let shiftHours = 0;
+    if (shiftVal === "1" || shiftVal === "2" || shiftVal === "3") {
+        shiftHours = 8; // default 8 jam per shift
+    }
+    let downtimePercent = shiftHours > 0 
+        ? ((totalDowntime / (shiftHours * 60)) * 100).toFixed(1) 
+        : 0;
+
+    // === Update UI ===
+    $("#spk-summary").show();
+    $("#sum-pass").text(totalPass);
+    $("#sum-reject").text(totalReject);
+    $("#sum-hold").text(totalHold);
+    $("#sum-percent").text(percent + "%");
+    $("#sum-reject-percent").text(rejectPercent + "%");
+    $("#sum-downtime-percent").text(downtimePercent + "%");
+}
+
+    // === Simpan ringkasan shift aktif ===
+    function saveShiftSummary() {
+        let shiftVal = $("#shift").val();
+        if (!shiftVal) return;
+
+        shiftData[shiftVal] = {
+            pass: $("#sum-pass").text(),
+            reject: $("#sum-reject").text(),
+            hold: $("#sum-hold").text(),
+            percent: $("#sum-percent").text(),
+            rejectPercent: $("#sum-reject-percent").text()
+        };
     }
 
-    $("#rejectModal").modal("hide");
+    // === Load ringkasan shift tertentu ===
+    function loadShiftSummary(shiftVal) {
+        if (shiftData[shiftVal]) {
+            let d = shiftData[shiftVal];
+            $("#sum-pass").text(d.pass);
+            $("#sum-reject").text(d.reject);
+            $("#sum-hold").text(d.hold);
+            $("#sum-percent").text(d.percent);
+            $("#sum-reject-percent").text(d.rejectPercent);
+            $("#spk-summary").show();
+        } else {
+            $("#sum-pass").text("0");
+            $("#sum-reject").text("0");
+            $("#sum-hold").text("0");
+            $("#sum-percent").text("0%");
+            $("#sum-reject-percent").text("0%");
+            $("#spk-summary").hide();
+        }
+    }
+    $(document).on("click", ".save-downtime", function () {
+    let row = $(this).closest("tr");
+    let jamMulai   = row.find("input[name*='jam_mulai']").val();
+    let jamSelesai = row.find("input[name*='jam_selesai']").val();
+    let jenis      = row.find("select[name*='jenis']").val();
+    let keterangan = row.find("input[name*='keterangan']").val();
+
+    if (!jamMulai || !jamSelesai) {
+        alert("Jam mulai dan jam selesai wajib diisi!");
+        return;
+    }
+
+    // contoh log - nanti bisa dikirim ke server lewat AJAX
+    console.log("Simpan downtime:", {
+        jamMulai, jamSelesai, jenis, keterangan
+    });
+
+    // Tandai sudah tersimpan
+    $(this).removeClass("btn-success")
+           .addClass("btn-secondary")
+           .prop("disabled", true)
+           .html("<i class='icon cil-check'></i> Tersimpan");
 });
+
+
+    // === Trigger auto update ===
+    $(document).on("input change", "#prodDetailTable input, #downtimeTable input", updateSummary);
 
 </script>

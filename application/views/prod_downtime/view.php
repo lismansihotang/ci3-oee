@@ -6,8 +6,8 @@
         <td><?= $row->id ?></td>
     </tr>
     <tr>
-        <th>shift_id</th>
-        <td><?= $row->shift_id ?></td>
+        <th>shift</th>
+        <td><?= $row->shift ?></td>
     </tr>
     <tr>
         <th>downtime_id</th>
@@ -56,6 +56,22 @@
     <tr>
         <th>deleted_at</th>
         <td><?= $row->deleted_at ?></td>
+    </tr>
+    <tr>
+        <th>prod_id</th>
+        <td><?= $row->prod_id ?></td>
+    </tr>
+    <tr>
+        <th>kd_ms</th>
+        <td><?= $row->kd_ms ?></td>
+    </tr>
+    <tr>
+        <th>tanggal</th>
+        <td><?= $row->tanggal ?></td>
+    </tr>
+    <tr>
+        <th>action</th>
+        <td><?= $row->action ?></td>
     </tr>
     </table>
     <div class="mt-3">

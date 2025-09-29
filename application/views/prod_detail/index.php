@@ -19,6 +19,7 @@
   'deleted_at' => 'Deleted_at',
   'jam' => 'Jam',
   'hold_qty' => 'Hold_qty',
+  'prod_id' => 'Prod_id',
 ),
         'rows' => $rows,
         'actions' => [

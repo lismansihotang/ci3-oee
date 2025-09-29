@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Machines_model extends MY_Model
 {
@@ -9,19 +9,18 @@ class Machines_model extends MY_Model
     protected $searchable_columns = [];
 
     public function get_dropdown()
-{
-    $result = $this->db->select('id, kode_mesin, nama_mesin')
-                       ->from('machines')
-                       ->order_by('id', 'DESC')
-                       ->get()
-                       ->result();
+    {
+        $result = $this->db->select('id, kode_mesin, nama_mesin')
+            ->from('machines')
+            ->order_by('id', 'DESC')
+            ->get()
+            ->result();
 
-    $dropdown = ['' => '-- Pilih Mesin --'];
-    foreach ($result as $row) {
-        // tampilkan kode mesin + nama mesin
-        $dropdown[$row->id] = $row->kode_mesin . ' - ' . $row->nama_mesin;
+        $dropdown = ['' => '-- Pilih Mesin --'];
+        foreach ($result as $row) {
+            // tampilkan kode mesin + nama mesin
+            $dropdown[$row->id] = $row->kode_mesin . ' - ' . $row->nama_mesin;
+        }
+        return $dropdown;
     }
-    return $dropdown;
-}
-
 }

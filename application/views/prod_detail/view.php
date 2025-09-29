@@ -49,6 +49,10 @@
         <th>hold_qty</th>
         <td><?= $row->hold_qty ?></td>
     </tr>
+    <tr>
+        <th>prod_id</th>
+        <td><?= $row->prod_id ?></td>
+    </tr>
     </table>
     <div class="mt-3">
         <div class="btn-group" role="group" aria-label="FormCreateUpdate">

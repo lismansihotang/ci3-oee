@@ -8,7 +8,7 @@
     <?= build_table([
         'headers' => array (
   'id' => 'Id',
-  'shift_id' => 'Shift_id',
+  'shift' => 'Shift',
   'downtime_id' => 'Downtime_id',
   'start_time' => 'Start_time',
   'end_time' => 'End_time',
@@ -21,6 +21,10 @@
   'created_at' => 'Created_at',
   'updated_at' => 'Updated_at',
   'deleted_at' => 'Deleted_at',
+  'prod_id' => 'Prod_id',
+  'kd_ms' => 'Kd_ms',
+  'tanggal' => 'Tanggal',
+  'action' => 'Action',
 ),
         'rows' => $rows,
         'actions' => [

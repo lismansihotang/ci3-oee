@@ -31,7 +31,9 @@ class MY_Controller extends CI_Controller
             'detail_table',
             'html',
             'date',
-            'array'
+            'array',
+            'db',
+            'accordion',
         ]);
         $this->load->library(['session']);
 
@@ -61,12 +63,12 @@ class MY_Controller extends CI_Controller
                 'url' => 'prod_utama',
                 'type' => 'link'
             ],
-             [
+            [
                 'label' => 'Prod_Detail',
                 'url' => 'prod_detail',
                 'type' => 'link'
             ],
-             [
+            [
                 'label' => 'Prod_QC',
                 'url' => 'prod_qc',
                 'type' => 'link'
@@ -122,7 +124,7 @@ class MY_Controller extends CI_Controller
                 'url' => 'jenis_reject',
                 'type' => 'link'
             ],
-             [
+            [
                 'label' => 'Jenis QC',
                 'url' => 'jenis_qc',
                 'type' => 'link'

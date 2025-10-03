@@ -89,3 +89,52 @@ if (!function_exists('replace_field')) {
         return $data;
     }
 }
+
+if (!function_exists('group_array')) {
+    /**
+     * Mengelompokkan array/object berdasarkan key yang diberikan, dengan opsi filter.
+     * * @param array $data Array data yang akan dikelompokkan (array of objects/arrays).
+     * @param string $group_key Key yang digunakan untuk mengelompokkan (misal: 'shift').
+     * @param string|null $filter_value Nilai spesifik untuk filter (misal: '1'), NULL untuk semua.
+     * @return array|null Array hasil pengelompokan, atau NULL jika filter_value diisi tapi tidak ada data yang cocok.
+     */
+    function group_array(array $data, string $group_key, $filter_value = null)
+    {
+        $grouped_data = [];
+
+        foreach ($data as $item) {
+            // Konversi item (object atau array) menjadi array untuk akses key yang universal
+            if (is_object($item)) {
+                $item_array = (array) $item;
+            } elseif (is_array($item)) {
+                $item_array = $item;
+            } else {
+                continue;
+            }
+
+            // Cek apakah key pengelompokan ada di item
+            if (!isset($item_array[$group_key])) {
+                continue;
+            }
+
+            $key = $item_array[$group_key];
+
+            // 1. Logika Filter: Jika filter_value diatur dan nilai item tidak cocok, lewati
+            if ($filter_value !== null && $key != $filter_value) {
+                continue;
+            }
+
+            // 2. Logika Pengelompokan: Item dimasukkan ke dalam hasil
+            $grouped_data[$key][] = $item; // Pertahankan item asli
+        }
+
+        // --- Perubahan Kunci di sini ---
+        // Jika filter_value diisi (bukan NULL) TAPI hasil pengelompokan kosong, kembalikan NULL.
+        // Jika filter_value NULL, kita kembalikan array kosong jika data kosong.
+        if ($filter_value !== null && empty($grouped_data)) {
+            return NULL;
+        }
+
+        return $grouped_data;
+    }
+}

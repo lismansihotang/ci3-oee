@@ -5,10 +5,10 @@
 
 <?= card_open(isset($row) ? '<i class="icon cil-factory"></i> Edit Produksi' : '<i class="icon cil-factory"></i> Tambah Produksi') ?>
 <form action="<?= site_url('/prod_utama/save'); ?>" method="post" id="form-produksi">
-
+    <input type="hidden" name="prod_id" value="<?= isset($row->id) ? $row->id : ''; ?>" />
     <?= bs_floating_input('tanggal', 'date', (isset($row) ? $row->tanggal : date('Y-m-d'))); ?>
     <?= bs_floating_select('operators_id', $operator_options, (isset($row) ? $row->operators_id : ''), 'operators_id', ['class' => 'select2-init']); ?>
-    <?= bs_floating_select('shift', ['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3'], (isset($row->shift) ? $row->shift : ''), 'shift', ['class' => 'select2-init']); ?>
+    <?= bs_floating_select('sh', ['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3'], (isset($shift) ? $shift : ''), 'shift', ['class' => 'select2-init']); ?>
     <?= bs_floating_select('kd_ms', $mesin_options, (isset($row) ? $row->kd_ms : ''), 'kd_ms', ['class' => 'select2-init']); ?>
     <?= bs_floating_select('no_spk', $spk_options, (isset($row) ? $row->no_spk : ''), 'no_spk', ['class' => 'select2-init']); ?>
 
@@ -46,8 +46,6 @@
     </div>
 
 
-
-
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" id="prodTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -59,43 +57,44 @@
 
     </ul>
     <div id="summary-hidden"></div>
+    <div id="reject-hidden-container"></div>
     <!-- Tab panes -->
     <div class="tab-content mt-3">
         <div class="tab-pane fade show active" id="tab-produksi" role="tabpanel">
             <?php
-            $headers = ['Jam', 'Pass',   'Reject', 'Hold', 'Aksi'];
-            $columns = ['jam', 'pass',  'reject_btn', 'hold', 'save_btn'];
+            $headers = ['Jam', 'Pass',   'Reject', 'Hold'];
+            $columns = ['jam', 'pass_qty',  'reject_btn', 'hold_qty'];
 
             $column_types = [
                 'jam' => 'time',
-                'pass' => 'number',
+                'pass_qty' => 'number',
                 //'finish' => 'number',
                 'reject_btn' => 'button',
-                'hold' => 'number',
-                'save_btn' => 'button'
-
+                'hold_qty' => 'number',
+                'id'        => 'hidden',
             ];
 
             $column_attributes = [
+                'id' => ['row-id-field' => true],
                 'reject_btn' => [
                     'class' => 'btn btn-sm btn-primary btn-reject',
                     'data-bs-toggle' => 'modal',
                     'data-bs-target' => '#rejectModalTemplate',
-                    'value' => '+ Tambah Reject Z'
+                    'data-detail-id' => '{id}',
+                    'value' => '+ Tambah Reject'
                 ]
             ];
 
-            //var_dump($column_attributes);
-            //var_dump($produksi_details);
             $details = isset($produksi_details) ? $produksi_details : [];
+            //var_dump($details);
             echo table_form_detail_generic('prodDetailTable', $headers, $columns, $details, $column_types, [], $column_attributes);
             ?>
         </div>
 
         <div class="tab-pane fade" id="tab-downtime" role="tabpanel">
             <?php
-            $headers = ['Jam Mulai', 'Jam Selesai', 'Jenis', 'Keterangan', 'Perbaikan', 'Aksi'];
-            $columns = ['jam_mulai', 'jam_selesai', 'jenis', 'keterangan', 'action', 'save_btn'];
+            $headers = ['Jam Mulai', 'Jam Selesai', 'Jenis', 'Keterangan', 'Perbaikan',];
+            $columns = ['jam_mulai', 'jam_selesai', 'jenis', 'keterangan', 'action',];
 
             $column_types = [
                 'jam_mulai' => 'time',
@@ -103,14 +102,11 @@
                 'jenis' => 'select2',
                 'keterangan' => 'text',
                 'action' => 'text',
-                'save_btn' => 'button'
             ];
 
             $column_attributes = [
-                'save_btn' => [
-                    'class' => 'btn btn-sm btn-success save-downtime',
-                    'value' => '<i class="icon cil-save"></i>'
-                ]
+                'jam_mulai'   => ['display' => 'input'],      // editable input type="time"
+                'jam_selesai' => ['display' => 'input'],
             ];
 
             $select_options = [
@@ -127,7 +123,7 @@
     <div class="mt-3">
         <div class="btn-group">
             <button type="submit" class="btn btn-success"><i class="icon cil-save"></i> Simpan</button>
-            <a href="<?= site_url('produksi') ?>" class="btn btn-secondary"><i class="icon cil-reload"></i> Kembali</a>
+            <a href="<?= site_url('prod_utama') ?>" class="btn btn-secondary"><i class="icon cil-reload"></i> Kembali</a>
         </div>
         <!-- <button type="button" class="btn btn-warning float-end">End Shift</button> -->
     </div>
@@ -187,6 +183,7 @@ echo modal_template(
     let currentRow = null;
 
     $(document).ready(function() {
+        $('body').css('overflow', 'auto');
         if ($("#prodDetailTable").length) $("#prodDetailTable").gridHelper();
         if ($("#downtimeTable").length) $("#downtimeTable").gridHelper();
 
@@ -218,11 +215,13 @@ echo modal_template(
         // === Konfigurasi kolom produksi ===
         const prodColumns = [{
                 name: "jam",
-                type: "time"
+                type: "time",
+                display: "readonly"
             },
             {
-                name: "pass",
-                type: "number"
+                name: "pass_qty",
+                type: "number",
+                defaultValue: 0
             },
             {
                 name: "reject_btn",
@@ -235,8 +234,9 @@ echo modal_template(
                 }
             },
             {
-                name: "hold",
-                type: "number"
+                name: "hold_qty",
+                type: "number",
+                defaultValue: 0
             },
             {
                 name: "save_btn",
@@ -281,25 +281,28 @@ echo modal_template(
                 shift: shiftVal,
                 columns: prodColumns,
                 shiftConfig: customShiftConfig,
-                force24h: true
+                refresh: true,
+                clearMode: "all"
             });
 
             loadShiftSummary(shiftVal); // tampilkan ringkasan shift terpilih
         });
 
-        // === Init default shift (edit mode) ===
-        const defaultShift = $("#shift").val();
-        if (defaultShift) {
-            $("#prodDetailTable").generateShiftRows({
-                shift: defaultShift,
-                columns: prodColumns,
-                shiftConfig: customShiftConfig,
-                force24h: true
-            });
-        }
+        $("#no_spk").trigger("change");
+
     });
 
-    // aktifkan reject handler
+    $(function() {
+        $.rejectHelper.init(); // => bind + update semua tombol berdasarkan hidden input
+    });
+
+    // OR jika Anda belum me-render hidden inputs dan ingin inject dari JSON:
+    const rejectDetails = <?= $reject_details_json ?? '{}' ?>;
+    // contoh bentuk rejectDetails: { "17": [{jenis_reject:"3",qty_reject:"10"}, ...], "20": [...] }
+    for (let rowId in rejectDetails) {
+        $.rejectHelper.saveToHidden(rowId, rejectDetails[rowId]);
+    }
+    // lalu inisialisasi tombol (agar tombol yg ada di tabel ikut diperbarui)
     $.rejectHelper.bindEvents();
 
     // aktifkan summary handler

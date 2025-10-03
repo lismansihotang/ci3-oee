@@ -49,7 +49,7 @@ class MY_Model extends CI_Model
     {
         // filter soft delete
         if ($this->db->field_exists('is_deleted', $this->table)) {
-            $this->db->where($this->table.'.is_deleted', 0);
+            $this->db->where($this->table . '.is_deleted', 0);
         }
 
         // select + group
@@ -79,11 +79,11 @@ class MY_Model extends CI_Model
                 $this->db->order_by('id', 'DESC', false); // alias id
             }
         } else {
-            $this->db->select($this->table.'.*');
+            $this->db->select($this->table . '.*');
             if ($this->order_by) {
                 $this->db->order_by($this->order_by[0], $this->order_by[1], false);
             } else {
-                $this->db->order_by($this->table.'.id', 'DESC');
+                $this->db->order_by($this->table . '.id', 'DESC');
             }
         }
 
@@ -146,7 +146,7 @@ class MY_Model extends CI_Model
 
         // filter soft delete
         if ($this->db->field_exists('is_deleted', $this->table)) {
-            $this->db->where($this->table.'.is_deleted', 0);
+            $this->db->where($this->table . '.is_deleted', 0);
         }
 
         // where biasa
@@ -202,6 +202,34 @@ class MY_Model extends CI_Model
             return $this->db->where('id', $id)->update($this->table, $data);
         } else {
             return $this->db->delete($this->table, ['id' => $id]);
+        }
+    }
+
+    public function delete_all($where = [])
+    {
+        if (empty($this->table) || empty($where)) {
+            return false;
+        }
+
+        foreach ($where as $field => $val) {
+            if (is_array($val)) {
+                $this->db->where_in($field, $val); // support WHERE IN
+            } else {
+                $this->db->where($field, $val);   // WHERE biasa
+            }
+        }
+
+        if ($this->db->field_exists('is_deleted', $this->table)) {
+            // Soft delete
+            $data = ['is_deleted' => 1];
+            if ($this->session->userdata('user_id')) {
+                $data['deleted_by'] = $this->session->userdata('user_id');
+                $data['deleted_at'] = date('Y-m-d H:i:s');
+            }
+            return $this->db->update($this->table, $data);
+        } else {
+            // Hard delete
+            return $this->db->delete($this->table);
         }
     }
 

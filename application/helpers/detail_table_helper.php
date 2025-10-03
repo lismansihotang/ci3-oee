@@ -39,6 +39,53 @@ if (!function_exists('generate_table_view')) {
             return '<p>No data to display.</p>';
         }
 
+        // --- MODIFIKASI DIMULAI DI SINI ---
+
+        $flat_data = [];
+        $is_grouped = FALSE;
+
+        if (!empty($data)) {
+            $first_group = reset($data);
+
+            // Cek apakah data masukan adalah array multidimensi (grup)
+            // Kriteria: $data adalah array, elemen pertama adalah array, dan elemen tersebut bukan object/array baris
+            if (is_array($first_group)) {
+
+                // Pemeriksaan yang lebih andal: Cek kunci array utama, dan cek apakah isinya array baris/object
+                $first_key = key($data);
+
+                // Jika kunci bukan 0 (misalnya '1', '2') DAN nilai pertama adalah array
+                if (!is_numeric($first_key) || is_numeric($first_key) && is_array($first_group) && count($first_group) > 0 && (is_object(reset($first_group)) || is_array(reset($first_group)))) {
+
+                    // Ini adalah data yang dikelompokkan (hasil group_array)
+                    $is_grouped = TRUE;
+                }
+            }
+        }
+
+
+        if ($is_grouped) {
+            // Data sudah dikelompokkan. Kita ratakan.
+            foreach ($data as $group_key => $group_rows) {
+                // Tambahkan semua baris dari grup ke array rata
+                $flat_data = array_merge($flat_data, $group_rows);
+            }
+        } else {
+            // Data adalah array biasa, tidak dikelompokkan. Gunakan data aslinya.
+            $flat_data = $data;
+        }
+
+        // Jika setelah perataan data kosong, kembalikan 'No data'
+        if (empty($flat_data)) {
+            return '<p>No data to display.</p>';
+        }
+
+        // Gunakan $flat_data untuk perulangan tabel selanjutnya
+        $data_to_loop = $flat_data;
+
+        // --- MODIFIKASI BERAKHIR DI SINI ---
+
+
         // table attributes
         $attr_string = '';
         foreach ($attributes as $key => $val) {
@@ -58,24 +105,39 @@ if (!function_exists('generate_table_view')) {
 
         // body
         $table .= '<tbody>';
-        foreach ($data as $row) {
+
+        // Gunakan $data_to_loop yang sudah diratakan
+        foreach ($data_to_loop as $row) {
+            // ... sisa logika loop untuk baris dan kolom tetap sama
+
             $table .= '<tr>';
             foreach ($headers_map as $header_title => $col) {
+                // ... (Logika mengambil nilai dan tipe kolom) ...
                 $property = is_array($col) ? ($col['property'] ?? null) : $col;
                 $type     = is_array($col) && isset($col['type']) ? $col['type'] : 'text';
                 $format   = is_array($col) && isset($col['format']) ? $col['format'] : null;
                 $params   = is_array($col) && isset($col['params']) ? $col['params'] : null;
                 $align    = is_array($col) && isset($col['align']) ? $col['align'] : 'left';
 
-                $value = $property && isset($row->$property) ? $row->$property : '';
+                // Akses property, tangani object atau array
+                $value = '';
+                if ($property) {
+                    if (is_object($row) && isset($row->$property)) {
+                        $value = $row->$property;
+                    } elseif (is_array($row) && isset($row[$property])) {
+                        $value = $row[$property];
+                    }
+                }
 
+                // ... (Logika switch case untuk link, button, dropdown, dsb.) ...
                 $content_html = '';
                 switch ($type) {
                     case 'link':
+                        // Pastikan penanganan link juga mendukung object/array jika $row adalah array
                         $link_property = $col['link_property'] ?? $property;
-                        $link_value    = $row->$link_property ?? '';
-                        $url           = base_url(($col['url'] ?? '') . $link_value);
-                        $text          = $col['link_text'] ?? $value;
+                        $link_value = is_object($row) ? ($row->$link_property ?? '') : ($row[$link_property] ?? '');
+                        $url = base_url(($col['url'] ?? '') . $link_value);
+                        $text = $col['link_text'] ?? $value;
                         $content_html  = '<a href="' . html_escape($url) . '" class="link-info link-underline link-underline-opacity-0">' . html_escape($text) . '</a>';
                         break;
 
@@ -95,7 +157,7 @@ if (!function_exists('generate_table_view')) {
                         if (isset($col['callback']) && is_callable($col['callback'])) {
                             $content_html = call_user_func($col['callback'], $row, $value);
                         } else {
-                            $content_html = html_escape($value);
+                            $content_html = format_value($value, $format, $params);
                         }
                         break;
 
@@ -103,6 +165,7 @@ if (!function_exists('generate_table_view')) {
                         $content_html = format_value($value, $format, $params);
                         break;
                 }
+                // ... (Akhir logika switch case) ...
 
                 $table .= '<td style="text-align:' . html_escape($align) . ';">' . $content_html . '</td>';
             }

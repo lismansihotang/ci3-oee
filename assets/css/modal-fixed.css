@@ -1,0 +1,10 @@
+body.modal-open {
+  overflow: auto !important;
+  padding-right: 0 !important;
+}
+
+/* supaya backdrop tidak mengunci scroll */
+.modal-backdrop.show {
+  position: static !important;  /* hilangkan fixed fullscreen */
+  background-color: transparent !important; /* atau kasih semi transparan tipis kalau masih mau ada efek */
+}

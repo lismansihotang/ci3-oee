@@ -89,7 +89,7 @@ $accod_items = [
                 'items' => [
                     [
                         'label' => 'Edit Detail [SHIFT 1]',
-                        'url'   => 'prod_utam/edit/' . $prod_id . '&shift=1',
+                        'url'   => ['prod_utama/edit', 'id' => $prod_id, 'shift' => '1'],
                         'icon'  => 'cil-pencil'
                     ],
                 ]
@@ -109,7 +109,7 @@ $accod_items = [
                 'items' => [
                     [
                         'label' => 'Edit Detail [SHIFT 2]',
-                        'url'   => 'prod_utam/edit/' . $prod_id . '&shift=2',
+                        'url'   => ['prod_utama/edit', 'id' => $prod_id, 'shift' => '2'],
                         'icon'  => 'cil-pencil'
                     ],
                 ]
@@ -129,7 +129,7 @@ $accod_items = [
                 'items' => [
                     [
                         'label' => 'Edit Detail [SHIFT 3]',
-                        'url'   => 'prod_utam/edit/' . $prod_id . '&shift=3',
+                        'url'   => ['prod_utama/edit', 'id' => $prod_id, 'shift' => '3'],
                         'icon'  => 'cil-pencil'
                     ],
                 ]

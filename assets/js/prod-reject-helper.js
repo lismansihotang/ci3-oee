@@ -1,13 +1,36 @@
 // =============================================================
-// Reject Helper Plugin (FINAL REFACTORED)
+// Reject Helper Plugin (FINAL FIXED + SUBMIT SAFE)
 // -------------------------------------------------------------
 // Dependensi: jQuery, Bootstrap 5 Modal, gridHelper (opsional), summaryHelper (opsional)
 // Tujuan: manage reject per-row, support hidden inputs,
 //         modal edit/create, update tombol, dan expose saveToHidden()
 // Fix: modal backdrop cleanup setelah save
+// Add: auto sync semua reject ke hidden input sebelum form submit
 // =============================================================
 (function ($) {
 	"use strict";
+
+	let newRowCounter = 0; // counter untuk row baru
+
+	function ensureRowId($row) {
+		let current = $row.attr("data-row-id");
+		if (current && current !== "") return current;
+
+		let realId = $row.find("input[name='id[]']").val();
+		if (realId && realId !== "") {
+			$row.attr("data-row-id", realId);
+			return realId;
+		}
+
+		// generate id baru untuk row baru
+		let tempId = "new_" + newRowCounter++; // prefix biar jelas ini row baru
+		$row.attr("data-row-id", tempId);
+
+		// isi hidden id[] supaya ikut tersubmit
+		$row.find("input[name='id[]']").val(tempId);
+
+		return tempId;
+	}
 
 	$.rejectHelper = {
 		createRow: function (templateRow, data = { jenis: "", qty: "" }) {
@@ -108,9 +131,7 @@
 			}
 
 			modal.find("table").removeAttr("id").addClass("reject-table");
-			if ($.fn.gridHelper) {
-				modal.find(".reject-table").gridHelper();
-			}
+			if ($.fn.gridHelper) modal.find(".reject-table").gridHelper();
 
 			let bsModal = new bootstrap.Modal(modal[0]);
 			bsModal.show();
@@ -120,7 +141,6 @@
 				let inst = bootstrap.Modal.getInstance(modal[0]);
 				if (inst) inst.dispose();
 				modal.remove();
-				// pastikan body reset
 				$(".modal-backdrop").remove();
 				$("body")
 					.removeClass("modal-open")
@@ -144,8 +164,8 @@
 
 			row.data("reject", rejects);
 
-			const rowId =
-				row.attr("data-row-id") ?? row.data("row-id") ?? row.index();
+			// pastikan rowId sudah fix
+			const rowId = ensureRowId(row);
 
 			let cell = row.find("td:has(.btn-reject)");
 			cell.find("input.reject-hidden").remove();
@@ -168,11 +188,8 @@
 				$.summaryHelper.update();
 			}
 
-			// Tutup modal + cleanup
 			let bsModal = bootstrap.Modal.getInstance(modal[0]);
-			if (bsModal) {
-				bsModal.hide();
-			}
+			if (bsModal) bsModal.hide();
 		},
 
 		saveToHidden: function (rowId, rejects = [], opts = {}) {
@@ -185,8 +202,7 @@
 				opts
 			);
 
-			const $container = $(cfg.targetContainer);
-			if ($container.length === 0) {
+			if ($(cfg.targetContainer).length === 0) {
 				$("body").append(
 					'<div id="reject-hidden-container" style="display:none"></div>'
 				);
@@ -235,12 +251,23 @@
 			this.bindEvents();
 			$(".btn-reject").each(function () {
 				let row = $(this).closest("tr");
+				ensureRowId(row);
 				if (!row.data("reject")) {
 					let rejects = $.rejectHelper.getRejectFromHidden(row);
 					row.data("reject", rejects);
 				}
 				$.rejectHelper.updateButton(row);
 			});
+
+			$("form")
+				.off("submit.rejectHelper")
+				.on("submit.rejectHelper", function () {
+					$(".btn-reject").each(function () {
+						let row = $(this).closest("tr");
+						let rowId = ensureRowId(row);
+						$.rejectHelper.saveToHidden(rowId, row.data("reject") || []);
+					});
+				});
 		},
 	};
 })(jQuery);

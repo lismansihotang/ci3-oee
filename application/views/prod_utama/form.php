@@ -5,46 +5,54 @@
 
 <?= card_open(isset($row) ? '<i class="icon cil-factory"></i> Edit Produksi' : '<i class="icon cil-factory"></i> Tambah Produksi') ?>
 <form action="<?= site_url('/prod_utama/save'); ?>" method="post" id="form-produksi">
-    <input type="hidden" name="prod_id" value="<?= isset($row->id) ? $row->id : ''; ?>" />
-    <?= bs_floating_input('tanggal', 'date', (isset($row) ? $row->tanggal : date('Y-m-d'))); ?>
-    <?= bs_floating_select('operators_id', $operator_options, (isset($row) ? $row->operators_id : ''), 'operators_id', ['class' => 'select2-init']); ?>
-    <?= bs_floating_select('sh', ['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3'], (isset($shift) ? $shift : ''), 'shift', ['class' => 'select2-init']); ?>
-    <?= bs_floating_select('kd_ms', $mesin_options, (isset($row) ? $row->kd_ms : ''), 'kd_ms', ['class' => 'select2-init']); ?>
-    <?= bs_floating_select('no_spk', $spk_options, (isset($row) ? $row->no_spk : ''), 'no_spk', ['class' => 'select2-init']); ?>
 
-    <hr>
     <div class="row">
-        <div class="col-md-6">
-            <div id="spk-target" class="card border-primary mb-3" style="display:none;">
-                <div class="card-header bg-primary text-white">🎯 Target SPK</div>
-                <div class="card-body">
-                    <ul class="mb-0">
-                        <li>Per Jam: <span id="target-per-jam"></span></li>
-                        <li>Per Shift: <span id="target-per-shift"></span></li>
-                        <li>Per Hari: <span id="target-per-day"></span></li>
-                    </ul>
-                </div>
+        <div class="col-7">
+            <input type="hidden" name="prod_id" value="<?= isset($row->id) ? $row->id : ''; ?>" />
+            <?= bs_floating_input('tanggal', 'date', (isset($row) ? $row->tanggal : date('Y-m-d'))); ?>
+            <?= bs_floating_select('operators_id', $operator_options, (isset($row) ? $row->operators_id : ''), 'operators_id', ['class' => 'select2-init']); ?>
+            <?= bs_floating_select('sh', ['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3'], (isset($shift) ? $shift : ''), 'shift', ['class' => 'select2-init']); ?>
+            <?= bs_floating_select('kd_ms', $mesin_options, (isset($row) ? $row->kd_ms : ''), 'kd_ms', ['class' => 'select2-init']); ?>
+            <div class="div-phase">
+
             </div>
+            <?= bs_floating_select('no_spk', $spk_options, (isset($row) ? $row->no_spk : ''), 'no_spk', ['class' => 'select2-init']); ?>
         </div>
+        <div class="col-5">
+            <div class="row">
+                <div class="col-12">
+                    <div id="spk-target" class="card border-primary mb-3" style="display:none;">
+                        <div class="card-header bg-primary text-white">🎯 Target SPK</div>
+                        <div class="card-body">
+                            <ul class="mb-0">
+                                <li>Per Jam: <span id="target-per-jam"></span></li>
+                                <li>Per Shift: <span id="target-per-shift"></span></li>
+                                <li>Per Hari: <span id="target-per-day"></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="col-md-6">
-            <div id="spk-summary" class="card border-success mb-3" style="display:none;">
-                <div class="card-header bg-success text-white">📊 Hasil Produksi (Shift)</div>
-                <div class="card-body">
-                    <ul class="mb-0">
-                        <li>Total Pass (Aktual): <span id="sum-pass">0</span></li>
-                        <li>Total Reject: <span id="sum-reject">0</span></li>
-                        <li>Total Hold: <span id="sum-hold">0</span></li>
-                        <li>Persentase Pencapaian: <span id="sum-percent">0%</span></li>
-                        <li>Persentase Reject: <span id="sum-reject-percent">0%</span></li>
-                        <li>Persentase Downtime: <span id="sum-downtime-percent">0%</span></li>
+                <div class="col-12">
+                    <div id="spk-summary" class="card border-success mb-3" style="display:none;">
+                        <div class="card-header bg-success text-white">📊 Hasil Produksi (Shift)</div>
+                        <div class="card-body">
+                            <ul class="mb-0">
+                                <li>Total Pass (Aktual): <span id="sum-pass">0</span></li>
+                                <li>Total Reject: <span id="sum-reject">0</span></li>
+                                <li>Total Hold: <span id="sum-hold">0</span></li>
+                                <li>Persentase Pencapaian: <span id="sum-percent">0%</span></li>
+                                <li>Persentase Reject: <span id="sum-reject-percent">0%</span></li>
+                                <li>Persentase Downtime: <span id="sum-downtime-percent">0%</span></li>
 
-                    </ul>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
+    <hr>
 
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" id="prodTabs" role="tablist">
@@ -160,7 +168,6 @@ echo modal_template(
 );
 ?>
 
-
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -177,13 +184,11 @@ echo modal_template(
 <script src="<?= base_url('assets/js/prod-reject-helper.js') ?>"></script>
 <script src="<?= base_url('assets/js/prod-summary-helper.js') ?>"></script>
 
-
 <script>
     let shiftData = {}; // simpan ringkasan per shift
     let currentRow = null;
 
     $(document).ready(function() {
-        $('body').css('overflow', 'auto');
         if ($("#prodDetailTable").length) $("#prodDetailTable").gridHelper();
         if ($("#downtimeTable").length) $("#downtimeTable").gridHelper();
 
@@ -290,6 +295,57 @@ echo modal_template(
 
         $("#no_spk").trigger("change");
 
+        $(document).on("change", "#kd_ms", function() {
+            ajaxRequest('<?= site_url("prod_utama/get_jenis_mesin") ?>/' + $(this).val(), {
+                onSuccess: function(data) {
+                    let $div = $(".div-phase");
+                    $div.empty();
+                    if (data && data === 'stamping') {
+                        // Buat wrapper form-floating
+                        let $wrapper = $('<div>', {
+                            class: 'form-floating mb-2'
+                        });
+
+                        // Buat select
+                        let $select = $('<select>', {
+                            name: 'phase',
+                            id: 'phase',
+                            class: 'form-select select2-init',
+                            'aria-label': 'Phase'
+                        });
+
+                        // Tambahkan options 1–15
+                        for (let i = 1; i <= 15; i++) {
+                            $select.append(
+                                $("<option>", {
+                                    value: i,
+                                    text: i
+                                })
+                            );
+                        }
+
+                        // Buat label
+                        let $label = $('<label>', {
+                            for: 'phase',
+                            text: 'Phase'
+                        });
+
+                        // Masukkan select + label ke wrapper
+                        $wrapper.append($select).append($label);
+
+                        // Append ke div-phase
+                        $div.append($wrapper);
+
+                        // Re-init select2
+                        $select.select2({
+                            theme: "bootstrap-5",
+                            width: '100%'
+                        });
+                    }
+                },
+            });
+        });
+
     });
 
     $(function() {
@@ -348,34 +404,4 @@ echo modal_template(
             $("#spk-summary").hide();
         }
     }
-    $(document).on("click", ".save-downtime", function() {
-        let row = $(this).closest("tr");
-        let jamMulai = row.find("input[name*='jam_mulai']").val();
-        let jamSelesai = row.find("input[name*='jam_selesai']").val();
-        let jenis = row.find("select[name*='jenis']").val();
-        let keterangan = row.find("input[name*='keterangan']").val();
-
-        if (!jamMulai || !jamSelesai) {
-            alert("Jam mulai dan jam selesai wajib diisi!");
-            return;
-        }
-
-        // contoh log - nanti bisa dikirim ke server lewat AJAX
-        console.log("Simpan downtime:", {
-            jamMulai,
-            jamSelesai,
-            jenis,
-            keterangan
-        });
-
-        // Tandai sudah tersimpan
-        $(this).removeClass("btn-success")
-            .addClass("btn-secondary")
-            .prop("disabled", true)
-            .html("<i class='icon cil-check'></i> Tersimpan");
-    });
-
-
-    // === Trigger auto update ===
-    //$(document).on("input change", "#prodDetailTable input, #downtimeTable input", updateSummary);
 </script>

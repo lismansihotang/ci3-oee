@@ -108,6 +108,10 @@ class Prod_utama extends MY_Controller
             'persen_down'  => $post_data['persen_down'],
         ];
 
+        if (isset($post_data['phase'])) {
+            $main_data['phase'] = $post_data['phase'];
+        }
+
         if ($is_edit) {
             $where_detail = ['prod_id' => $prod_id, 'shift' => $shift];
             $this->model->update($prod_id, $main_data);
@@ -130,10 +134,13 @@ class Prod_utama extends MY_Controller
         $jam_data = $post_data['jam'] ?? [];
         $id_data = $post_data['id'] ?? [];
         for ($i = 0; $i < count($jam_data); $i++) {
-            $rowId = $id_data[$i] ?? $i;
+            $rawId = $id_data[$i] ?? '';
+            // pakai id jika ada, kalau tidak generate new_i
+            $rowId = ($rawId !== '') ? $rawId : 'new_' . $i;
+
             $detail_data = [
                 'prod_id'   => $prod_id,
-                'shift'  => $shift,
+                'shift'     => $shift,
                 'jam'       => $jam_data[$i],
                 'pass_qty'  => ($post_data['pass_qty'][$i] !== '') ? $post_data['pass_qty'][$i] : 0,
                 'hold_qty'  => ($post_data['hold_qty'][$i] !== '') ? $post_data['hold_qty'][$i] : 0,
@@ -142,7 +149,7 @@ class Prod_utama extends MY_Controller
             $this->prod_detail_model->insert($detail_data);
             $detail_id = $this->db->insert_id();
 
-            // mapping rowId ke detail_id
+            // mapping rowId -> detail_id
             $detail_ids[$rowId] = $detail_id;
         }
 
@@ -188,25 +195,42 @@ class Prod_utama extends MY_Controller
             $this->session->set_flashdata('success', $msg);
         }
 
-        redirect('prod_utama');
+        // redirect into next level or move into view
+        $int_shift = (int) $shift;
+
+        $page_redirect = ($int_shift < 3)
+            ? 'prod_utama/edit/' . $prod_id . '/' . min($int_shift + 1, 3)
+            : 'prod_utama/view/' . $prod_id;
+
+        redirect($page_redirect);
     }
 
     private function get_detail_rejects($prod_details = [])
     {
         $results = [];
-        foreach ($prod_details as $detail) {
-            $rejects = $this->prod_reject_model->get_data(['prod_detail_id' => $detail->id]);
-            if ($rejects) {
-                foreach ($rejects as $r) {
-                    $results[$detail->id][] = (object) [
-                        'jenis_reject' => $r->kd_reject,
-                        'qty_reject'   => $r->qty
-                    ];
+        if (!empty($prod_details)) {
+            $counter = 1;
+
+            foreach ($prod_details as $detail) {
+                if (isset($detail->id)) {
+                    $rejects = $this->prod_reject_model->get_data(['prod_detail_id' => $detail->id]);
+                    if ($rejects) {
+                        foreach ($rejects as $r) {
+                            $results[$detail->id][] = (object) [
+                                'jenis_reject' => $r->kd_reject,
+                                'qty_reject'   => $r->qty
+                            ];
+                        }
+                    } else {
+                        $results[$detail->id] = [];
+                    }
+                } else {
+                    $results[$counter] = [];
                 }
-            } else {
-                $results[$detail->id] = [];
+                $counter++;
             }
         }
+
         return $results;
     }
 
@@ -231,17 +255,30 @@ class Prod_utama extends MY_Controller
 
     public function edit($id, $view = '')
     {
+        $arrUri = $this->uri->segment_array();
+
         $this->setTitle('Ubah Data Prod_utama');
         $data = $this->_commonFormData();
         $prod_utama = $this->model->get_data(['id' => $id], [], '', true);
+        // default shift
         $shift = 1;
         $arrShift = explode(',', $prod_utama->sh);
         if (!empty($arrShift)) {
             $count = count($arrShift);
             $shift = $arrShift[$count - 1];
         }
+        // check via uri & assign shift if exists
+        if (array_key_exists(4, $arrUri) === true) {
+            $uri_segment = $arrUri[4];
+            $arrShift = [1, 2, 3];
+            if (in_array($uri_segment, $arrShift) === true) {
+                $shift = $uri_segment;
+            }
+        }
+
         $data['shift'] = $shift;
-        $data['produksi_details'] = $this->prod_detail_model->get_data(['prod_id' => $id, 'shift' => $shift]);
+        $details = $this->prod_detail_model->get_data(['prod_id' => $id, 'shift' => $shift]);
+        $data['produksi_details'] = ($details) ? $details : get_shift_hours_rev($shift);
         $data['downtime_details'] = $this->get_data_downtimes(['prod_id' => $id, 'shift' => $shift]);
         $data['reject_details'] = $this->get_detail_rejects($data['produksi_details']);
         $data['reject_details_json'] = json_encode($data['reject_details']);
@@ -297,5 +334,10 @@ class Prod_utama extends MY_Controller
             'per_day'   => 18189
         ];
         echo json_encode($data);
+    }
+
+    public function get_jenis_mesin($mesin_id)
+    {
+        echo json_encode(strtolower(get_single_value('Machines_model', ['id' => $mesin_id], 'jenis_mesin')));
     }
 }

@@ -7,7 +7,7 @@ class Migration_Prod_Downtime_Alter extends CI_Migration
     public function up()
     {
         // TODO: define schema changes here
-        $fieldDetails = [
+        /**$fieldDetails = [
             'prod_id' => [
                 'type' => 'INT',
                 'constraint' => 11,
@@ -33,7 +33,7 @@ class Migration_Prod_Downtime_Alter extends CI_Migration
             ],
         ];
 
-        $this->dbforge->add_column('prod_downtime', $fieldDetails);
+        $this->dbforge->add_column('prod_downtime', $fieldDetails);**/
     }
 
     public function down()

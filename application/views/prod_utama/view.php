@@ -68,6 +68,7 @@ $prod_detail_headers = [
 ];
 
 $prod_downtime_headers = [
+    'shift' => ['label' => 'Shift', 'property' => 'shift', 'align' => 'center'],
     'start_time' => ['label' => 'Start Time', 'property' => 'start_time', 'align' => 'center'],
     'end_time' => ['label' => 'End Time', 'property' => 'end_time', 'align' => 'center'],
     'duration_min' => ['label' => 'Duration', 'property' => 'duration_min', 'align' => 'center'],

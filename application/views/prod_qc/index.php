@@ -7,16 +7,17 @@
     ]) ?>
     <?= build_table([
         'headers' => array (
-//   'id' => 'Id',
-  'prod_id' => 'Prod ID',
-  'kd_jenis_qc' => 'Kode Jenis',
+  'id' => 'Id',
+  'prod_id' => 'Prod_id',
+  'kd_jenis_qc' => 'Kd_jenis_qc',
+  'jam' => 'Jam',
   'nilai' => 'Nilai',
-//   'is_deleted' => 'Is_deleted',
-//   'created_by' => 'Created_by',
-//   'updated_by' => 'Updated_by',
-//   'deleted_by' => 'Deleted_by',
-//   'created_at' => 'Created_at',
-//   'updated_at' => 'Updated_at',
+  'is_deleted' => 'Is_deleted',
+  'created_by' => 'Created_by',
+  'updated_by' => 'Updated_by',
+  'deleted_by' => 'Deleted_by',
+  'created_at' => 'Created_at',
+  'updated_at' => 'Updated_at',
 ),
         'rows' => $rows,
         'actions' => [

@@ -14,6 +14,10 @@
         <td><?= $row->kd_jenis_qc ?></td>
     </tr>
     <tr>
+        <th>jam</th>
+        <td><?= $row->jam ?></td>
+    </tr>
+    <tr>
         <th>nilai</th>
         <td><?= $row->nilai ?></td>
     </tr>

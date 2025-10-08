@@ -54,46 +54,30 @@ class MY_Controller extends CI_Controller
                 'type' => 'link'
             ],
             [
-                'label' => 'SPK',
+                'label' => 'SPK (Surat Perintah Kerja)',
                 'url' => 'spk',
                 'type' => 'link'
             ],
             [
-                'label' => 'Prod_Utama',
+                'label' => 'Production',
                 'url' => 'prod_utama',
                 'type' => 'link'
             ],
-            [
-                'label' => 'Prod_Detail',
-                'url' => 'prod_detail',
-                'type' => 'link'
-            ],
-            [
-                'label' => 'Prod_QC',
-                'url' => 'prod_qc',
-                'type' => 'link'
-            ],
-            [
-                'label' => 'Prod_Downtime',
-                'url' => 'prod_downtime',
-                'label' => 'Production (Log)',
-                'url' => 'prod_shift_log',
-                'type' => 'link'
-            ],
-            [
-                'label' => 'Production (Detail)',
-                'url' => 'prod_detail',
-                'type' => 'link'
-            ],
-            [
-                'label' => 'Production (Downtime)',
-                'url' => 'prod_downtime',
-                'type' => 'link'
-            ],
-            [
-                'label' => 'Jenis Reject',
-                'url' => 'jenis_reject',
-                'type' => 'link'
+              [
+                'label' => 'Quality Control',
+                'type'  => 'collapse',
+                'children' => [
+                    [
+                        'label' => 'Inspeksi Harian',
+                        'url'   => 'prod_qc',
+                        'type'  => 'link'
+                    ],
+                    [
+                        'label' => 'Laporan Inspector',
+                        'url'   => 'inspector_qc',
+                        'type'  => 'link'
+                    ],
+                ]
             ],
             [
                 'label' => 'Components',

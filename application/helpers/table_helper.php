@@ -70,17 +70,74 @@ if (!function_exists('build_table')) {
                 }
 
                 // kolom aksi
+                /**
+                 * 'actions' => [
+                 *   'view' => [
+                 *       'url'   => 'products/view/{id}/{category_id}/{batch_no}',
+                 *       'title' => 'Lihat Detail',
+                 *       'icon'  => 'cil-magnifying-glass',
+                 *       'class' => 'btn-primary',
+                 *   ],
+                 *   'edit' => 'products/edit', // default behavior (pakai id)
+                 *   'delete' => [
+                 *       'url' => 'products/delete/{id}',
+                 *       'class' => 'btn-danger btn-delete',
+                 *   ],
+                 * ],
+                 */
                 if (!empty($actions)) {
-                    $html .= '<td>';
-                    if (isset($actions['view'])) {
-                        $html .= '<a href="' . site_url($actions['view'] . '/' . $r->id) . '" class="btn btn-sm btn-info" data-coreui-toggle="tooltip" data-coreui-placement="top" title="View Data Ini"><i class="icon cil-browser"></i> View</a> ';
+                    $html .= '<td class="text-nowrap">';
+
+                    foreach ($actions as $key => $action) {
+                        // default label & icon
+                        $btn_class = [
+                            'view'   => 'btn-info',
+                            'edit'   => 'btn-warning',
+                            'delete' => 'btn-danger',
+                        ][$key] ?? 'btn-secondary';
+
+                        $icon = [
+                            'view'   => 'cil-browser',
+                            'edit'   => 'cil-pencil',
+                            'delete' => 'cil-trash',
+                        ][$key] ?? 'cil-task';
+
+                        $title = ucfirst($key);
+
+                        // jika $action berupa string biasa
+                        if (is_string($action)) {
+                            $url = site_url($action . '/' . $r->id);
+                        }
+
+                        // jika $action berupa array dengan template atau callback
+                        elseif (is_array($action)) {
+                            if (isset($action['url'])) {
+                                $url_template = $action['url'];
+                                // Gantikan {property} di template URL dengan nilai dari $r
+                                $url = preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($r) {
+                                    $prop = $matches[1];
+                                    return isset($r->$prop) ? $r->$prop : '';
+                                }, $url_template);
+                                $url = site_url($url);
+                            } elseif (isset($action['callback']) && is_callable($action['callback'])) {
+                                // Jalankan callback jika disediakan
+                                $url = call_user_func($action['callback'], $r);
+                            } else {
+                                $url = '#';
+                            }
+
+                            // Custom label/icon/title/class jika disediakan
+                            $title     = $action['title'] ?? $title;
+                            $icon      = $action['icon'] ?? $icon;
+                            $btn_class = $action['class'] ?? $btn_class;
+                        }
+
+                        // render link
+                        $html .= '<a href="' . htmlspecialchars($url) . '" class="btn btn-sm ' . $btn_class . '" data-coreui-toggle="tooltip" title="' . htmlspecialchars($title) . '">'
+                            . '<i class="icon ' . htmlspecialchars($icon) . '"></i> ' . htmlspecialchars($title)
+                            . '</a> ';
                     }
-                    if (isset($actions['edit'])) {
-                        $html .= '<a href="' . site_url($actions['edit'] . '/' . $r->id) . '" class="btn btn-sm btn-warning" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Edit Data Ini"><i class="icon cil-pencil"></i> Edit</a> ';
-                    }
-                    if (isset($actions['delete'])) {
-                        $html .= '<a href="' . site_url($actions['delete'] . '/' . $r->id) . '" class="btn btn-sm btn-danger btn-delete" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Hapus Data Ini"><i class="icon cil-trash"></i> Delete</a>';
-                    }
+
                     $html .= '</td>';
                 }
                 $html .= '</tr>';

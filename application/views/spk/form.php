@@ -8,10 +8,11 @@
     <div class="row">
         <div class="col-6">
             <?= bs_floating_input('no_spk', 'text', (isset($row) ? $row->no_spk : ''), null, 'no_spk', [], 'No. SPK'); ?>
-            <?= bs_floating_select('kd_machine', $list_machines, (isset($row) ? $row->no_spk : ''), 'kd_machine', ['class' => 'select2-init'], 'Mesin'); ?>
-            <?= bs_floating_select('no_po', $list_po, (isset($row) ? $row->no_spk : ''), 'no_po', ['class' => 'select2-init'], 'No. PO'); ?>
+            <?= bs_floating_select('kd_machine', $list_machines, (isset($row) ? $row->kd_machine : ''), 'kd_machine', ['class' => 'select2-init'], 'Mesin'); ?>
+            <?= bs_floating_select('no_po', $list_po, (isset($row) ? $row->no_po : ''), 'no_po', ['class' => 'select2-init'], 'No. PO'); ?>
+            
             <div class="form-floating mb-3">
-                <input type="email" class="form-control" id="kd_product_display" value="<?= isset($row) ? $row->kd_product . ' - ' . $row->nama_produk : '-' ?>" readonly>
+                <input type="email" class="form-control" id="kd_product_display" value="<?= isset($row) ? $row->kd_product :'' ?>" readonly>
                 <label for="kd_product_display">Produk</label>
             </div>
             <input type="hidden" name="kd_product" id="kd_product" value="<?= isset($row) ? $row->kd_product : '' ?>">
@@ -36,10 +37,10 @@
                     <?= bs_floating_input('tjam', 'number', (isset($row) ? $row->tjam : ''), null, 't_jam', [], 'Produksi'); ?>
                 </div>
                 <div class="col-4">
-                    <?= bs_floating_input('print_jam', 'number', (isset($row) ? $row->printjam : ''), null, 'print_jam', [], 'Printing'); ?>
+                    <?= bs_floating_input('print_jam', 'number', (isset($row) ? $row->print_jam : ''), null, 'print_jam', [], 'Printing'); ?>
                 </div>
                 <div class="col-4">
-                    <?= bs_floating_input('stamp_jam', 'number', (isset($row) ? $row->stampjam : ''), null, 'stamp_jam', [], 'Stamping'); ?>
+                    <?= bs_floating_input('stamp_jam', 'number', (isset($row) ? $row->stamp_jam : ''), null, 'stamp_jam', [], 'Stamping'); ?>
                 </div>
             </div>
 
@@ -49,10 +50,10 @@
                     <?= bs_floating_input('tshift', 'number', (isset($row) ? $row->tshift : ''), null, 't_shift', [], 'Produksi'); ?>
                 </div>
                 <div class="col-4">
-                    <?= bs_floating_input('print_shift', 'number', (isset($row) ? $row->printshift : ''), null, 'print_shift', [], 'Printing'); ?>
+                    <?= bs_floating_input('print_shift', 'number', (isset($row) ? $row->print_shift : ''), null, 'print_shift', [], 'Printing'); ?>
                 </div>
                 <div class="col-4">
-                    <?= bs_floating_input('stamp_shift', 'number', (isset($row) ? $row->stampshift : ''), null, 'stamp_shift', [], 'Stamping'); ?>
+                    <?= bs_floating_input('stamp_shift', 'number', (isset($row) ? $row->stamp_shift : ''), null, 'stamp_shift', [], 'Stamping'); ?>
                 </div>
             </div>
 
@@ -62,10 +63,10 @@
                     <?= bs_floating_input('tday', 'number', (isset($row) ? $row->tday : ''), null, 't_day', [], 'Produksi'); ?>
                 </div>
                 <div class="col-4">
-                    <?= bs_floating_input('print_day', 'number', (isset($row) ? $row->printday : ''), null, 'print_day', [], 'Printing'); ?>
+                    <?= bs_floating_input('print_day', 'number', (isset($row) ? $row->print_day : ''), null, 'print_day', [], 'Printing'); ?>
                 </div>
                 <div class="col-4">
-                    <?= bs_floating_input('stamp_day', 'number', (isset($row) ? $row->stampday : ''), null, 'stamp_day', [], 'Stamping'); ?>
+                    <?= bs_floating_input('stamp_day', 'number', (isset($row) ? $row->stamp_day : ''), null, 'stamp_day', [], 'Stamping'); ?>
                 </div>
             </div>
 

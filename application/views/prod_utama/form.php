@@ -209,6 +209,7 @@ echo modal_template(
             } else {
                 $('#spk-target').hide();
             }
+            
         });
 
         // === Select2 ===

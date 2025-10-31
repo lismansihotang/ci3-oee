@@ -53,4 +53,10 @@ public function get_dropdown()
             ->get()
             ->result();
     }
+public function get_by_code($product_code)
+    {
+        $this->db->where('kd_produk', $product_code);
+        $query = $this->db->get($this->table);
+        return $query->row();
+    }
 }

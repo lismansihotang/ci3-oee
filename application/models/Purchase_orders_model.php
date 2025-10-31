@@ -26,7 +26,7 @@ class Purchase_orders_model extends MY_Model
         $this->load->helper('db');
 
         $selectProduk = db_string_agg($this->db, 'p.nama_produk');
-        $whereYear    = db_year_filter($this->db, 'po.tgl_kirim', 2024);
+        $whereYear    = db_year_filter($this->db, 'po.tgl_kirim', 2025);
 
         $result = $this->db->select("po.id, po.no_po, {$selectProduk} as produk", false)
             ->from('purchase_orders po')

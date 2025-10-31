@@ -1,157 +1,91 @@
-<?= card_open('<i class="icon cil-spreadsheet"></i> Detail Spk') ?>
-    <table class="table table-bordered">
-        
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<?= card_open('<i class="icon cil-spreadsheet"></i> Detail SPK') ?>
+
+<div class="row mb-3">
+    <div class="col-8">
+        <?= generate_card_info('Nomor SPK',  $row->no_spk  , "info"); ?>
+    </div>
+    <div class="col-4 text-end">
+        <div class="btn-group" role="group" aria-label="FormCreateUpdate">
+            <a href="<?= site_url('spk/edit/' . $row->id) ?>" class="btn btn-warning" title="Edit Data Ini"><i class="icon cil-pencil"></i> Edit</a>
+            <a href="<?= site_url('spk/delete/' . $row->id) ?>" class="btn btn-danger" onclick="return confirm('Hapus data ini?')" title="Hapus Data Ini"><i class="icon cil-trash"></i> Delete</a>
+            <a href="<?= site_url('spk') ?>" class="btn btn-secondary" title="< Kembali ke List Data"><i class="icon cil-reload"></i> Kembali</a>
+            <a href="<?= site_url('/') ?>" class="btn btn-outline-dark" title="< Kembali ke Halaman Utama"><i class="icon cil-home"></i></a>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered table-hover align-middle">
     <tr>
-        <th>id</th>
-        <td><?= $row->id ?></td>
+        <th style="width: 25%">Kode Mesin</th>
+        <td>
+            <span class="badge bg-dark"><?= $row->kd_machine ?></span>
+        </td>
     </tr>
     <tr>
-        <th>no_spk</th>
-        <td><?= $row->no_spk ?></td>
+        <th>Kode Produk</th>
+        <td><span class="badge bg-success"><?= $row->kd_product ?></span></td>
     </tr>
     <tr>
-        <th>kd_machine</th>
-        <td><?= $row->kd_machine ?></td>
-    </tr>
-    <tr>
-        <th>kd_product</th>
-        <td><?= $row->kd_product ?></td>
-    </tr>
-    <tr>
-        <th>cavity</th>
+        <th>Cavity</th>
         <td><?= $row->cavity ?></td>
     </tr>
     <tr>
-        <th>ct</th>
+        <th>Cycle Time (CT)</th>
         <td><?= $row->ct ?></td>
     </tr>
     <tr>
-        <th>tgl_mulai</th>
-        <td><?= $row->tgl_mulai ?></td>
+        <th>Tanggal Mulai</th>
+        <td><?= indo_date($row->tgl_mulai, true) ?></td>
     </tr>
     <tr>
-        <th>tgl_selesai</th>
-        <td><?= $row->tgl_selesai ?></td>
+        <th>Tanggal Selesai</th>
+        <td><?= indo_date($row->tgl_selesai, true) ?></td>
     </tr>
     <tr>
-        <th>no_mould</th>
+        <th>No. Mould</th>
         <td><?= $row->no_mould ?></td>
     </tr>
     <tr>
-        <th>no_po</th>
+        <th>No. PO</th>
         <td><?= $row->no_po ?></td>
     </tr>
     <tr>
-        <th>jml_ord</th>
-        <td><?= $row->jml_ord ?></td>
+        <th>Jumlah Order</th>
+        <td><?= number_format($row->jml_ord) ?></td>
     </tr>
     <tr>
-        <th>keterangan</th>
-        <td><?= $row->keterangan ?></td>
+        <th>Keterangan</th>
+        <td><?= $row->keterangan ?: '<span class="text-muted">-</span>' ?></td>
     </tr>
     <tr>
-        <th>tjam</th>
-        <td><?= $row->tjam ?></td>
+        <th>Status</th>
+        <td>
+            <?php
+            $status_badge = match (strtoupper($row->status)) {
+                'OPEN' => 'warning',
+                'PROGRESS' => 'primary',
+                'CLOSE' => 'success',
+                default => 'secondary'
+            };
+            ?>
+            <span class="badge rounded-pill bg-<?= $status_badge ?>"><?= strtoupper($row->status) ?></span>
+        </td>
     </tr>
-    <tr>
-        <th>tshift</th>
-        <td><?= $row->tshift ?></td>
-    </tr>
-    <tr>
-        <th>tday</th>
-        <td><?= $row->tday ?></td>
-    </tr>
-    <tr>
-        <th>ct_print</th>
-        <td><?= $row->ct_print ?></td>
-    </tr>
-    <tr>
-        <th>ct_stamp</th>
-        <td><?= $row->ct_stamp ?></td>
-    </tr>
-    <tr>
-        <th>print_jam</th>
-        <td><?= $row->print_jam ?></td>
-    </tr>
-    <tr>
-        <th>print_shift</th>
-        <td><?= $row->print_shift ?></td>
-    </tr>
-    <tr>
-        <th>print_day</th>
-        <td><?= $row->print_day ?></td>
-    </tr>
-    <tr>
-        <th>stamp_jam</th>
-        <td><?= $row->stamp_jam ?></td>
-    </tr>
-    <tr>
-        <th>stamp_shift</th>
-        <td><?= $row->stamp_shift ?></td>
-    </tr>
-    <tr>
-        <th>stamp_day</th>
-        <td><?= $row->stamp_day ?></td>
-    </tr>
-    <tr>
-        <th>status</th>
-        <td><?= $row->status ?></td>
-    </tr>
-    <tr>
-        <th>sub</th>
-        <td><?= $row->sub ?></td>
-    </tr>
-    <tr>
-        <th>no</th>
-        <td><?= $row->no ?></td>
-    </tr>
-    <tr>
-        <th>jumlah_jam</th>
-        <td><?= $row->jumlah_jam ?></td>
-    </tr>
-    <tr>
-        <th>tgl_mulai2</th>
-        <td><?= $row->tgl_mulai2 ?></td>
-    </tr>
-    <tr>
-        <th>tgl_selesai2</th>
-        <td><?= $row->tgl_selesai2 ?></td>
-    </tr>
-    <tr>
-        <th>is_deleted</th>
-        <td><?= $row->is_deleted ?></td>
-    </tr>
-    <tr>
-        <th>created_by</th>
-        <td><?= $row->created_by ?></td>
-    </tr>
-    <tr>
-        <th>updated_by</th>
-        <td><?= $row->updated_by ?></td>
-    </tr>
-    <tr>
-        <th>deleted_by</th>
-        <td><?= $row->deleted_by ?></td>
-    </tr>
-    <tr>
-        <th>created_at</th>
-        <td><?= $row->created_at ?></td>
-    </tr>
-    <tr>
-        <th>updated_at</th>
-        <td><?= $row->updated_at ?></td>
-    </tr>
-    <tr>
-        <th>deleted_at</th>
-        <td><?= $row->deleted_at ?></td>
-    </tr>
-    </table>
-    <div class="mt-3">
-        <div class="btn-group" role="group" aria-label="FormCreateUpdate">
-            <a href="<?= site_url('spk/edit/'.$row->id) ?>" class="btn btn-warning" data-coreui-toggle="tooltip" data-coreui-placement"top" title="Edit Data Ini"><i class="icon cil-pencil"></i> Edit</a>
-            <a href="<?= site_url('spk/delete/'.$row->id) ?>" class="btn btn-danger" onclick="return confirm('Hapus data ini?')" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Hapus Data Ini"><i class="icon cil-trash"></i> Delete</a>
-            <a href="<?= site_url('spk') ?>" class="btn btn-secondary" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke List Data"><i class="icon cil-reload"></i> Kembali</a>
-            <a href="<?= site_url('/') ?>" class="btn btn-outline-dark" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke Halaman Utama"><i class="icon cil-home"></i> </a>
-        </div>
-    </div>
+</table>
+
+<?= card_open('<i class="icon cil-description"></i> Informasi Tambahan', ['class' => 'border-top-warning border-top-3']) ?>
+<div class="row">
+    <div class="col-md-4 mb-2"><?= generate_card_info('Created At', indo_date($row->created_at, true), 'primary'); ?></div>
+    <div class="col-md-4 mb-2"><?= generate_card_info('Updated At', indo_date($row->updated_at, true)); ?></div>
+    <div class="col-md-4 mb-2"><?= generate_card_info('Created By', $row->created_by); ?></div>
+</div>
+<?= card_close() ?>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="<?= base_url('assets/js/sweetalert-helper.js') ?>"></script>
+
 <?= card_close() ?>

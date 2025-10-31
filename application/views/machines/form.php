@@ -1,12 +1,70 @@
-<?= card_open(isset($row) ? '<i class="icon cil-window"></i> Edit Machines' : '<i class="icon cil-window"></i> Tambah Machines') ?>
-    <form method="post">
-        <?= bs_floating_input('id', 'text', (isset($row) ? $row->id : '')); ?><?= bs_floating_input('kode_mesin', 'text', (isset($row) ? $row->kode_mesin : '')); ?><?= bs_floating_input('nama_mesin', 'text', (isset($row) ? $row->nama_mesin : '')); ?><?= bs_floating_input('jenis_mesin', 'text', (isset($row) ? $row->jenis_mesin : '')); ?><?= bs_floating_input('urutan', 'text', (isset($row) ? $row->urutan : '')); ?><?= bs_floating_input('jenis', 'text', (isset($row) ? $row->jenis : '')); ?><?= bs_floating_input('manufacturer', 'text', (isset($row) ? $row->manufacturer : '')); ?><?= bs_floating_input('kapasitas_kontainer', 'text', (isset($row) ? $row->kapasitas_kontainer : '')); ?><?= bs_floating_input('screw_speed', 'text', (isset($row) ? $row->screw_speed : '')); ?><?= bs_floating_input('hp', 'text', (isset($row) ? $row->hp : '')); ?><?= bs_floating_input('max_mold', 'text', (isset($row) ? $row->max_mold : '')); ?><?= bs_floating_input('min_mold', 'text', (isset($row) ? $row->min_mold : '')); ?><?= bs_floating_input('max_diameter_single_head', 'text', (isset($row) ? $row->max_diameter_single_head : '')); ?><?= bs_floating_input('tinggi_mesin', 'text', (isset($row) ? $row->tinggi_mesin : '')); ?><?= bs_floating_input('lebar_mesin', 'text', (isset($row) ? $row->lebar_mesin : '')); ?><?= bs_floating_input('panjang_mesin', 'text', (isset($row) ? $row->panjang_mesin : '')); ?><?= bs_floating_input('berat_mesin', 'text', (isset($row) ? $row->berat_mesin : '')); ?><?= bs_floating_input('rate', 'text', (isset($row) ? $row->rate : '')); ?><?= bs_floating_input('operator', 'text', (isset($row) ? $row->operator : '')); ?><?= bs_floating_input('listrik', 'text', (isset($row) ? $row->listrik : '')); ?><?= bs_floating_input('depresiasi', 'text', (isset($row) ? $row->depresiasi : '')); ?><?= bs_floating_input('foh_lain', 'text', (isset($row) ? $row->foh_lain : '')); ?><?= bs_floating_input('indirect_labour', 'text', (isset($row) ? $row->indirect_labour : '')); ?><?= bs_floating_input('direct_labour', 'text', (isset($row) ? $row->direct_labour : '')); ?><?= bs_floating_input('general_adm', 'text', (isset($row) ? $row->general_adm : '')); ?><?= bs_floating_input('marketing', 'text', (isset($row) ? $row->marketing : '')); ?><?= bs_floating_input('is_deleted', 'text', (isset($row) ? $row->is_deleted : '')); ?><?= bs_floating_input('created_by', 'text', (isset($row) ? $row->created_by : '')); ?><?= bs_floating_input('updated_by', 'text', (isset($row) ? $row->updated_by : '')); ?><?= bs_floating_input('deleted_by', 'text', (isset($row) ? $row->deleted_by : '')); ?><?= bs_floating_input('created_at', 'text', (isset($row) ? $row->created_at : '')); ?><?= bs_floating_input('updated_at', 'text', (isset($row) ? $row->updated_at : '')); ?><?= bs_floating_input('deleted_at', 'text', (isset($row) ? $row->deleted_at : '')); ?>
-        <div class="mt-3">
-            <div class="btn-group" role="group" aria-label="FormCreateUpdate">
-                <button type="submit" class="btn btn-success" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Simpan Data Sekarang"><i class="icon cil-save"></i> Simpan</button>
-                <a href="<?= site_url('machines') ?>" class="btn btn-secondary" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke List Data"><i class="icon cil-reload"></i> Kembali</a>
-                <a href="<?= site_url('/') ?>" class="btn btn-outline-dark" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke Halaman Utama"><i class="icon cil-home"></i></a>
-            </div>
+<?= card_open(isset($row)
+    ? '<i class="icon cil-window"></i> Edit Machines'
+    : '<i class="icon cil-window"></i> Tambah Machines') ?>
+
+<form method="post">
+    <?= bs_floating_input('id', 'text', isset($row) ? $row->id : '') ?>
+    <?= bs_floating_input('kode_mesin', 'text', isset($row) ? $row->kode_mesin : '') ?>
+    <?= bs_floating_input('nama_mesin', 'text', isset($row) ? $row->nama_mesin : '') ?>
+    <?= bs_floating_input('jenis_mesin', 'text', isset($row) ? $row->jenis_mesin : '') ?>
+    <?= bs_floating_input('urutan', 'text', isset($row) ? $row->urutan : '') ?>
+    <?= bs_floating_input('jenis', 'text', isset($row) ? $row->jenis : '') ?>
+    <?= bs_floating_input('manufacturer', 'text', isset($row) ? $row->manufacturer : '') ?>
+    <?= bs_floating_input('kapasitas_kontainer', 'text', isset($row) ? $row->kapasitas_kontainer : '') ?>
+    <?= bs_floating_input('screw_speed', 'text', isset($row) ? $row->screw_speed : '') ?>
+    <?= bs_floating_input('hp', 'text', isset($row) ? $row->hp : '') ?>
+    <?= bs_floating_input('max_mold', 'text', isset($row) ? $row->max_mold : '') ?>
+    <?= bs_floating_input('min_mold', 'text', isset($row) ? $row->min_mold : '') ?>
+    <?= bs_floating_input('max_diameter_single_head', 'text', isset($row) ? $row->max_diameter_single_head : '') ?>
+    <?= bs_floating_input('tinggi_mesin', 'text', isset($row) ? $row->tinggi_mesin : '') ?>
+    <?= bs_floating_input('lebar_mesin', 'text', isset($row) ? $row->lebar_mesin : '') ?>
+    <?= bs_floating_input('panjang_mesin', 'text', isset($row) ? $row->panjang_mesin : '') ?>
+    <?= bs_floating_input('berat_mesin', 'text', isset($row) ? $row->berat_mesin : '') ?>
+    <?= bs_floating_input('rate', 'text', isset($row) ? $row->rate : '') ?>
+    <?= bs_floating_input('operator', 'text', isset($row) ? $row->operator : '') ?>
+    <?= bs_floating_input('listrik', 'text', isset($row) ? $row->listrik : '') ?>
+    <?= bs_floating_input('depresiasi', 'text', isset($row) ? $row->depresiasi : '') ?>
+    <?= bs_floating_input('foh_lain', 'text', isset($row) ? $row->foh_lain : '') ?>
+    <?= bs_floating_input('indirect_labour', 'text', isset($row) ? $row->indirect_labour : '') ?>
+    <?= bs_floating_input('direct_labour', 'text', isset($row) ? $row->direct_labour : '') ?>
+    <?= bs_floating_input('general_adm', 'text', isset($row) ? $row->general_adm : '') ?>
+    <?= bs_floating_input('marketing', 'text', isset($row) ? $row->marketing : '') ?>
+    <?= bs_floating_input('is_deleted', 'text', isset($row) ? $row->is_deleted : '') ?>
+    <?= bs_floating_input('created_by', 'text', isset($row) ? $row->created_by : '') ?>
+    <?= bs_floating_input('updated_by', 'text', isset($row) ? $row->updated_by : '') ?>
+    <?= bs_floating_input('deleted_by', 'text', isset($row) ? $row->deleted_by : '') ?>
+    <?= bs_floating_input('created_at', 'text', isset($row) ? $row->created_at : '') ?>
+    <?= bs_floating_input('updated_at', 'text', isset($row) ? $row->updated_at : '') ?>
+    <?= bs_floating_input('deleted_at', 'text', isset($row) ? $row->deleted_at : '') ?>
+
+    <div class="mt-3">
+        <div class="btn-group" role="group" aria-label="FormCreateUpdate">
+            <button
+                type="submit"
+                class="btn btn-success"
+                data-coreui-toggle="tooltip"
+                data-coreui-placement="top"
+                title="Simpan Data Sekarang">
+                <i class="icon cil-save"></i> Simpan
+            </button>
+
+            <a href="<?= site_url('machines') ?>"
+               class="btn btn-secondary"
+               data-coreui-toggle="tooltip"
+               data-coreui-placement="top"
+               title="< Kembali ke List Data">
+                <i class="icon cil-reload"></i> Kembali
+            </a>
+
+            <a href="<?= site_url('/') ?>"
+               class="btn btn-outline-dark"
+               data-coreui-toggle="tooltip"
+               data-coreui-placement="top"
+               title="< Kembali ke Halaman Utama">
+                <i class="icon cil-home"></i>
+            </a>
         </div>
-    </form>
+    </div>
+</form>
+
 <?= card_close() ?>

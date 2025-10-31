@@ -7,11 +7,11 @@
     ]) ?>
     <?= build_table([
         'headers' => array (
-  'id' => 'Id',
-  'kd_qc' => 'Kd_qc',
-  'kd_ms' => 'Kd_ms',
-  'nama_qc' => 'Nama_qc',
-  'satuan' => 'Satuan',
+  'id' => 'ID',
+  'kd_qc' => 'Kode',
+  'kd_ms' => 'Kode Mesin',
+  'nama_qc' => 'Tipe Quality',
+//   'satuan' => 'Satuan',
 ),
         'rows' => $rows,
         'actions' => [

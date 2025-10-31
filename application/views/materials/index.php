@@ -8,10 +8,10 @@
     <?= build_table([
         'headers' => array (
   'id' => 'ID',
-  'kode' => 'KODE',
-  'nama' => 'NAMA',
+  'kode' => 'Kode Material',
+  'nama' => 'Nama Material',
 //   'qty' => 'QTY',
-//   'jenis' => 'JENIS',
+'jenis' => 'Jenis',
 //   'lokasi_1' => 'LOKASI 1',
 //   'lokasi_2' => 'LOKASI 2',
 //   'keterangan' => 'KET',

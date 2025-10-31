@@ -19,6 +19,9 @@ class MY_Model extends CI_Model
     protected $group_by = null;
     protected $order_by = null;
     protected $group_mode = 'MIN';
+    protected $joins = []; // array of ['table' => 'produk', 'condition' => 'produk.id = spk.id_produk', 'type' => 'left']
+    protected $select_fields = '*';
+
 
     public function __construct()
     {
@@ -45,58 +48,80 @@ class MY_Model extends CI_Model
         return $this;
     }
 
-    private function _apply_query($search_term = '')
-    {
-        // filter soft delete
-        if ($this->db->field_exists('is_deleted', $this->table)) {
-            $this->db->where($this->table . '.is_deleted', 0);
-        }
-
-        // select + group
-        if ($this->group_by) {
-            $fields = $this->db->list_fields($this->table);
-            $selects = [];
-
-            foreach ($fields as $field) {
-                if ($field === 'id') {
-                    $selects[] = "{$this->group_mode}({$this->table}.id) as id";
-                } else {
-                    $selects[] = "{$this->group_mode}({$this->table}.{$field}) as {$field}";
-                }
+   private function _apply_query($search_term = '')
+{
+    // filter soft delete
+    if ($this->db->field_exists('is_deleted', $this->table)) {
+        $this->db->where($this->table . '.is_deleted', 0);
+    }
+    if (!empty($this->joins)) {
+        $joinedTables = [];
+        foreach ($this->joins as $join) {
+            $table = $join['table'];
+            if (!in_array($table, $joinedTables)) {
+                $this->db->join(
+                    $join['table'],
+                    $join['condition'],
+                    isset($join['type']) ? $join['type'] : 'left'
+                );
+                $joinedTables[] = $table;
             }
-
-            $this->db->select(implode(", ", $selects), false);
-
-            $group = is_array($this->group_by) ? $this->group_by : [$this->group_by];
-            foreach ($group as $g) {
-                $this->db->group_by($g);
-            }
-
-            // order
-            if ($this->order_by) {
-                $this->db->order_by($this->order_by[0], $this->order_by[1], false);
-            } else {
-                $this->db->order_by('id', 'DESC', false); // alias id
-            }
-        } else {
-            $this->db->select($this->table . '.*');
-            if ($this->order_by) {
-                $this->db->order_by($this->order_by[0], $this->order_by[1], false);
-            } else {
-                $this->db->order_by($this->table . '.id', 'DESC');
-            }
-        }
-
-        // search
-        if ($search_term && $this->searchable_columns) {
-            $search_term = strtolower($search_term);
-            $this->db->group_start();
-            foreach ($this->searchable_columns as $col) {
-                $this->db->or_like("LOWER($col)", $search_term, 'both', false);
-            }
-            $this->db->group_end();
         }
     }
+
+    // select + group
+    if ($this->group_by) {
+        $fields = $this->db->list_fields($this->table);
+        $selects = [];
+
+        foreach ($fields as $field) {
+            if ($field === 'id') {
+                $selects[] = "{$this->group_mode}({$this->table}.id) as id";
+            } else {
+                $selects[] = "{$this->group_mode}({$this->table}.{$field}) as {$field}";
+            }
+        }
+
+        $this->db->select(implode(", ", $selects), false);
+
+        $group = is_array($this->group_by) ? $this->group_by : [$this->group_by];
+        foreach ($group as $g) {
+            $this->db->group_by($g);
+        }
+
+        // order
+        if ($this->order_by) {
+            $this->db->order_by($this->order_by[0], $this->order_by[1], false);
+        } else {
+            $this->db->order_by('id', 'DESC', false);
+        }
+
+    } else {
+        $select = !empty($this->select_fields)
+            ? $this->select_fields
+            : "{$this->table}.*";
+
+        $this->db->select($select, false);
+
+        // order
+        if ($this->order_by) {
+            $this->db->order_by($this->order_by[0], $this->order_by[1], false);
+        } else {
+            $this->db->order_by($this->table . '.id', 'DESC');
+        }
+    }
+
+    // search
+    if ($search_term && $this->searchable_columns) {
+        $search_term = strtolower($search_term);
+        $this->db->group_start();
+        foreach ($this->searchable_columns as $col) {
+            $this->db->or_like("LOWER($col)", $search_term, 'both', false);
+        }
+        $this->db->group_end();
+    }
+}
+
 
     public function get_all($limit = 10, $offset = 0)
     {

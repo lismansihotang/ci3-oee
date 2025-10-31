@@ -11,11 +11,11 @@
                 <?= bs_floating_input('tanggal', 'date', isset($row) ? $row->tanggal : ''); ?>
             </div>
             <div class="col-md-4">
-                <?= bs_floating_select('kd_machine', $list_machines, (isset($row) ? $row->kd_machine : ''), 'kd_machine', ['class' => 'select2-init'], 'Mesin'); ?>
+                <?= bs_floating_select('machines_id', $list_machines, (isset($row) ? $row->machines_id : ''), 'kd_machine', ['class' => 'select2-init'], 'Mesin'); ?>
             </div>
             <div class="col-md-4">
                 <?php 
-                    $list_shift = ['S1' => 'Shift 1', 'S2' => 'Shift 2', 'S3' => 'Shift 3'];
+                    $list_shift = ['1' => 'Shift 1', '2' => 'Shift 2', '3' => 'Shift 3'];
                     echo bs_floating_select('shift', $list_shift, (isset($row) ? $row->shift : ''), '', [], 'Shift');
                 ?>
             </div>
@@ -93,7 +93,7 @@
                         'OK'=> 'OK',
                         'NOT OK'=> 'NOT OK',
                     ];
-                    echo bs_floating_select('status', $list_status_prob, (isset($row) ? $row->status : ''), '', [], 'Status Problem');
+                    echo bs_floating_select('status_problem', $list_status_prob, (isset($row) ? $row->status_problem : ''), '', [], 'Status Problem');
                 ?>
             </div>
             <div class="col-md-6">

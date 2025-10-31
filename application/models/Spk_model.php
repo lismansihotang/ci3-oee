@@ -6,8 +6,32 @@ class Spk_model extends MY_Model
 {
     protected $table = 'spk';
 
-    // Tentukan kolom untuk pencarian
-    protected $searchable_columns = [];
+    protected $joins = [
+        [
+            'table' => 'products',
+            'condition' => 'products.kd_produk = spk.kd_product',
+            'type' => 'left'
+        ],
+        [
+            'table' => 'machines',
+            'condition' => 'machines.id = spk.kd_machine',
+            'type' => 'left'
+        ]
+    ];
+
+    protected $select_fields = '
+        spk.*,
+        products.nama_produk,
+        machines.nama_mesin
+    ';
+
+    protected $searchable_columns = [
+        'spk.no_spk',
+        'products.nama_produk',
+        'machines.nama_mesin'
+    ];
+
+     
 
     public function insert($data)
     {
@@ -45,5 +69,7 @@ class Spk_model extends MY_Model
     {
         return $this->db->get_where($this->table, ['id' => $id_spk])->row();
     }
+
+
 
 }

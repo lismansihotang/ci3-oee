@@ -82,128 +82,133 @@ class Prod_utama extends MY_Controller
     }
 
     public function save()
-    {
-        $post_data = $this->input->post();
+{
+    $post_data = $this->input->post();
 
-        // Begin transaction
-        $this->db->trans_start();
+    // Begin transaction
+    $this->db->trans_start();
 
-        $is_edit = !empty($post_data['prod_id']); // cek apakah edit
-        $prod_id = $is_edit ? $post_data['prod_id'] : null;
-        // shift
-        $shift = isset($post_data['sh']) ? $post_data['sh'] : '1';
+    $shift = isset($post_data['sh']) ? $post_data['sh'] : '1';
 
-        // --- prod_utama / prod_utama_model ---
-        $main_data = [
-            'tanggal'      => $post_data['tanggal'],
-            'sh'           => $this->_process_shift_data($prod_id, $shift),
-            'kd_prod'      => "-", // bisa generate otomatis
-            'kd_ms'        => $post_data['kd_ms'],
-            'no_spk'       => $post_data['no_spk'],
-            'operators_id' => $post_data['operators_id'],
-            'jml_pass'     => $post_data['jml_pass'],
-            'jml_hold'     => $post_data['jml_hold'],
-            'persen_pass'  => $post_data['persen_pass'],
-            'persen_reject' => $post_data['persen_reject'],
-            'persen_down'  => $post_data['persen_down'],
+    // === Cek apakah sudah ada data utama (per tanggal + mesin + spk) ===
+    $existing = $this->db->get_where('prod_utama', [
+        'tanggal' => $post_data['tanggal'],
+        'kd_ms'   => $post_data['kd_ms'],
+        'no_spk'  => $post_data['no_spk'],
+        'is_deleted' => 0
+    ])->row();
+
+    // --- Siapkan data utama ---
+    $main_data = [
+        'tanggal'       => $post_data['tanggal'],
+        'kd_prod'       => $post_data['kd_prod'],
+        'kd_ms'         => $post_data['kd_ms'],
+        'no_spk'        => $post_data['no_spk'],
+        'operators_id'  => $post_data['operators_id'],
+        'persen_pass'   => $post_data['persen_pass'],
+        'persen_reject' => $post_data['persen_reject'],
+        'persen_down'   => $post_data['persen_down'],
+        'sh'            => $shift,
+    ];
+
+    if (isset($post_data['phase'])) {
+        $main_data['phase'] = $post_data['phase'];
+    }
+
+    if ($existing) {
+        // === UPDATE + AKUMULASI ===
+        $main_data['jml_pass'] = $existing->jml_pass + (int)$post_data['jml_pass'];
+        $main_data['jml_hold'] = $existing->jml_hold + (int)$post_data['jml_hold'];
+
+        // Rata-rata persen dari yang lama dan baru
+        $main_data['persen_pass']   = round(($existing->persen_pass + $post_data['persen_pass']) / 2, 2);
+        $main_data['persen_reject'] = round(($existing->persen_reject + $post_data['persen_reject']) / 2, 2);
+        $main_data['persen_down']   = round(($existing->persen_down + $post_data['persen_down']) / 2, 2);
+
+        $this->db->where('id', $existing->id)->update('prod_utama', $main_data);
+        $prod_id = $existing->id;
+    } else {
+        // === INSERT BARU ===
+        $main_data['jml_pass'] = (int)$post_data['jml_pass'];
+        $main_data['jml_hold'] = (int)$post_data['jml_hold'];
+        $this->model->insert($main_data);
+        $prod_id = $this->db->insert_id();
+    }
+
+    // === PROD DETAIL ===
+    $detail_ids = [];
+    $jam_data = $post_data['jam'] ?? [];
+    $id_data  = $post_data['id'] ?? [];
+
+    for ($i = 0; $i < count($jam_data); $i++) {
+        $rawId = $id_data[$i] ?? '';
+        $rowId = ($rawId !== '') ? $rawId : 'new_' . $i;
+
+        $detail_data = [
+            'prod_id'   => $prod_id,
+            'shift'     => $shift,
+            'jam'       => $jam_data[$i],
+            'pass_qty'  => ($post_data['pass_qty'][$i] !== '') ? $post_data['pass_qty'][$i] : 0,
+            'hold_qty'  => ($post_data['hold_qty'][$i] !== '') ? $post_data['hold_qty'][$i] : 0,
         ];
 
-        if (isset($post_data['phase'])) {
-            $main_data['phase'] = $post_data['phase'];
-        }
+        // langsung insert tanpa hapus data shift sebelumnya
+        $this->prod_detail_model->insert($detail_data);
+        $detail_id = $this->db->insert_id();
 
-        if ($is_edit) {
-            $where_detail = ['prod_id' => $prod_id, 'shift' => $shift];
-            $this->model->update($prod_id, $main_data);
-            $prod_details = $this->prod_detail_model->get_data($where_detail);
-            $prod_detail_ids = array_column($prod_details, 'id');
-
-            if (!empty($prod_detail_ids)) {
-                // hapus detail lama supaya clean insert lagi
-                $this->prod_reject_model->delete_all(['prod_detail_id' => $prod_detail_ids]);
-            }
-            $this->prod_detail_model->delete_all($where_detail);
-            $this->prod_downtime_model->delete_all($where_detail);
-        } else {
-            $this->model->insert($main_data);
-            $prod_id = $this->db->insert_id();
-        }
-
-        // --- prod_detail ---
-        $detail_ids = [];
-        $jam_data = $post_data['jam'] ?? [];
-        $id_data = $post_data['id'] ?? [];
-        for ($i = 0; $i < count($jam_data); $i++) {
-            $rawId = $id_data[$i] ?? '';
-            // pakai id jika ada, kalau tidak generate new_i
-            $rowId = ($rawId !== '') ? $rawId : 'new_' . $i;
-
-            $detail_data = [
-                'prod_id'   => $prod_id,
-                'shift'     => $shift,
-                'jam'       => $jam_data[$i],
-                'pass_qty'  => ($post_data['pass_qty'][$i] !== '') ? $post_data['pass_qty'][$i] : 0,
-                'hold_qty'  => ($post_data['hold_qty'][$i] !== '') ? $post_data['hold_qty'][$i] : 0,
-            ];
-
-            $this->prod_detail_model->insert($detail_data);
-            $detail_id = $this->db->insert_id();
-
-            // mapping rowId -> detail_id
-            $detail_ids[$rowId] = $detail_id;
-        }
-
-        // --- prod_rejects ---
-        $rejects = mapRejects($post_data['rejects'] ?? [], $detail_ids);
-        if (!empty($rejects)) {
-            $this->prod_reject_model->insert_batch($rejects);
-        }
-
-        // --- prod_downtime ---
-        $downtimes = [];
-        if (!empty($post_data['jam_mulai'])) {
-            for ($i = 0; $i < count($post_data['jam_mulai']); $i++) {
-                if ($post_data['jam_mulai'][$i] !== '' && $post_data['jam_selesai'][$i] !== '') {
-                    $arr_time     = time_diff($post_data['jam_mulai'][$i], $post_data['jam_selesai'][$i]);
-                    $duration_min = $arr_time['total_minutes'];
-                    $downtimes[] = [
-                        'prod_id'      => $prod_id,
-                        'shift'        => $shift,
-                        'kd_ms'        => $post_data['kd_ms'],
-                        'tanggal'      => $post_data['tanggal'],
-                        'downtime_id'  => $post_data['jenis'][$i],
-                        'start_time'   => $post_data['jam_mulai'][$i],
-                        'end_time'     => $post_data['jam_selesai'][$i],
-                        'duration_min' => $duration_min,
-                        'notes'        => $post_data['keterangan'][$i],
-                        'action'       => $post_data['action'][$i],
-                    ];
-                }
-            }
-
-            if (!empty($downtimes)) {
-                $this->prod_downtime_model->insert_batch($downtimes);
-            }
-        }
-
-        $this->db->trans_complete();
-
-        if ($this->db->trans_status() === FALSE) {
-            $this->session->set_flashdata('error', 'Data gagal disimpan!');
-        } else {
-            $msg = $is_edit ? 'Data berhasil diperbarui!' : 'Data berhasil disimpan!';
-            $this->session->set_flashdata('success', $msg);
-        }
-
-        // redirect into next level or move into view
-        $int_shift = (int) $shift;
-
-        $page_redirect = ($int_shift < 3)
-            ? 'prod_utama/edit/' . $prod_id . '/' . min($int_shift + 1, 3)
-            : 'prod_utama/view/' . $prod_id;
-
-        redirect($page_redirect);
+        $detail_ids[$rowId] = $detail_id;
     }
+
+    // === PROD REJECTS ===
+    $rejects = mapRejects($post_data['rejects'] ?? [], $detail_ids);
+    if (!empty($rejects)) {
+        $this->prod_reject_model->insert_batch($rejects);
+    }
+
+    // === PROD DOWNTIME ===
+    $downtimes = [];
+    if (!empty($post_data['jam_mulai'])) {
+        for ($i = 0; $i < count($post_data['jam_mulai']); $i++) {
+            if ($post_data['jam_mulai'][$i] !== '' && $post_data['jam_selesai'][$i] !== '') {
+                $arr_time     = time_diff($post_data['jam_mulai'][$i], $post_data['jam_selesai'][$i]);
+                $duration_min = $arr_time['total_minutes'];
+                $downtimes[] = [
+                    'prod_id'      => $prod_id,
+                    'shift'        => $shift,
+                    'kd_ms'        => $post_data['kd_ms'],
+                    'tanggal'      => $post_data['tanggal'],
+                    'downtime_id'  => $post_data['jenis'][$i],
+                    'start_time'   => $post_data['jam_mulai'][$i],
+                    'end_time'     => $post_data['jam_selesai'][$i],
+                    'duration_min' => $duration_min,
+                    'notes'        => $post_data['keterangan'][$i],
+                    'action'       => $post_data['action'][$i],
+                ];
+            }
+        }
+
+        if (!empty($downtimes)) {
+            $this->prod_downtime_model->insert_batch($downtimes);
+        }
+    }
+
+    $this->db->trans_complete();
+
+    if ($this->db->trans_status() === FALSE) {
+        $this->session->set_flashdata('error', 'Data gagal disimpan!');
+    } else {
+        $this->session->set_flashdata('success', 'Data berhasil disimpan & diakumulasikan!');
+    }
+
+    // redirect
+    $int_shift = (int)$shift;
+    $page_redirect = ($int_shift < 3)
+        ? 'prod_utama/edit/' . $prod_id . '/' . min($int_shift + 1, 3)
+        : 'prod_utama/view/' . $prod_id;
+
+    redirect($page_redirect);
+}
+
 
     private function get_detail_rejects($prod_details = [])
     {
@@ -309,35 +314,38 @@ class Prod_utama extends MY_Controller
             ->set_output(json_encode($hours));
     }
 
-    public function get_spk_target($id_spk)
-    {
-        $spk = $this->Spk_model->get_by_id($id_spk); // pakai id
+   public function get_spk_target($id_spk)
+{
+    $spk = $this->Spk_model->get_by_id($id_spk); // ambil data SPK dari model
 
-        if ($spk) {
-            $data = [
-                'per_jam'   => $spk->tjam,
-                'per_shift' => $spk->tshift,
-                'per_day'   => $spk->tday,
-                'ct'   => $spk->ct,
-            ];
-        } else {
-            $data = [
-                'per_jam'   => 0,
-                'per_shift' => 0,
-                'per_day'   => 0
-            ];
-        }
-
+    if ($spk) {
         $data = [
-            'per_jam'   => 757,
-            'per_shift' => 6063,
-            'per_day'   => 18189
+            'per_jam'   => (float)$spk->tjam,
+            'per_shift' => (float)$spk->tshift,
+            'per_day'   => (float)$spk->tday,
+            'ct'        => (float)$spk->ct,
+            'kd_product' => $spk->kd_product ?? '', // jika ingin menampilkan nama produk juga
+            'nama_produk' => $spk->nama_produk ?? '',
+            'produk_gabung' => trim(($spk->kd_product ?? '') . ' - ' . ($spk->nama_produk ?? ''))
         ];
-        echo json_encode($data);
+    } else {
+        $data = [
+            'per_jam'   => 0,
+            'per_shift' => 0,
+            'per_day'   => 0,
+            'ct'        => 0,
+            'kd_product' => '',
+            'nama_produk' => '',
+            'produk_gabung' => ''
+        ];
     }
+
+    echo json_encode($data);
+}
 
     public function get_jenis_mesin($mesin_id)
     {
         echo json_encode(strtolower(get_single_value('Machines_model', ['id' => $mesin_id], 'jenis_mesin')));
     }
+    
 }

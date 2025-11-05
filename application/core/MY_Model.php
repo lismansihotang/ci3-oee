@@ -326,4 +326,5 @@ class MY_Model extends CI_Model
         }
         return $this->db->get($this->detail_table)->result();
     }
+    
 }

@@ -22,13 +22,15 @@ class Spk_model extends MY_Model
     protected $select_fields = '
         spk.*,
         products.nama_produk,
-        machines.nama_mesin
+        machines.nama_mesin,
+        machines.kode_mesin
     ';
 
     protected $searchable_columns = [
         'spk.no_spk',
         'products.nama_produk',
-        'machines.nama_mesin'
+        'machines.nama_mesin',
+        'machines.kode_mesin'
     ];
 
      
@@ -65,10 +67,21 @@ class Spk_model extends MY_Model
     return $dropdown;
 }
 
- public function get_by_id($id_spk)
-    {
-        return $this->db->get_where($this->table, ['id' => $id_spk])->row();
+public function get_by_id($id_spk)
+{
+    $this->db->select($this->select_fields);
+    $this->db->from($this->table);
+
+    if (!empty($this->joins)) {
+        foreach ($this->joins as $join) {
+            $this->db->join($join['table'], $join['condition'], $join['type']);
+        }
     }
+
+    $this->db->where($this->table . '.id', $id_spk);
+
+    return $this->db->get()->row();
+}
 
 
 

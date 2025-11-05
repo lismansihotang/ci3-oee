@@ -17,6 +17,13 @@
 
             </div>
             <?= bs_floating_select('no_spk', $spk_options, (isset($row) ? $row->no_spk : ''), 'no_spk', ['class' => 'select2-init']); ?>
+<input type="hidden" name="kd_prod" id="kd_prod" value="<?= isset($row) ? $row->kd_prod : '' ?>">
+<?= bs_floating_input('kd_product', 'text', (isset($row) ? $row->kd_prod : ''), 'Kode Produk', 'readonly'); ?>
+            <div class="form-floating mb-2">
+                <input type="text" class="form-control" id="nama_produk" name="nama_produk" placeholder="Nama Produk" readonly>
+                <label for="nama_produk">Nama Produk</label>
+            </div>
+
         </div>
         <div class="col-5">
             <div class="row">
@@ -203,6 +210,10 @@ echo modal_template(
                             $('#target-per-jam').text(data.per_jam);
                             $('#target-per-shift').text(data.per_shift);
                             $('#target-per-day').text(data.per_day);
+                            $('[name="kd_prod"]').val(data.kd_product || '');
+                            $('[name="kd_product"]').val(data.kd_product || '');
+                            $('[name="nama_produk"]').val(data.nama_produk || '');
+
                         }
                     },
                 });

@@ -9,7 +9,7 @@
         'headers' => array (
   'id' => 'Id',
   'tanggal' => 'Tanggal',
-  'machines_id' => 'Machines',
+  'nama_mesin' => 'Mesin',
   'shift' => 'Shift',
   'phase' => 'Phase',
   'problem' => 'Problem',

@@ -57,7 +57,7 @@ if (!function_exists('generate_accordion')) {
                 } else {
                     $is_first = true;
                     foreach ($actions as $action) {
-                        $url   = base_url($action['url'] ?? '#');
+                        $url   = site_url($action['url'] ?? '#');
                         $label = $action['label'] ?? 'Action';
                         $class = $action['class'] ?? 'btn btn-sm btn-outline-secondary';
                         $margin = $is_first ? '' : ' ms-2';
@@ -116,7 +116,7 @@ if (!function_exists('render_accordion_dropdown_actions')) {
         $html .= '  </button>';
         $html .= '  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="' . $menu_id . '">';
         foreach ($items as $item) {
-            $url   = base_url($item['url'] ?? '#');
+            $url   = site_url($item['url'] ?? '#');
             $label = $item['label'] ?? 'Action';
             $icon_html = !empty($item['icon']) ? '<i class="' . html_escape($item['icon']) . ' me-2"></i>' : '';
             $class = $item['class'] ?? '';

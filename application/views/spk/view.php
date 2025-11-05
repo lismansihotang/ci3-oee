@@ -19,14 +19,25 @@
 
 <table class="table table-bordered table-hover align-middle">
     <tr>
-        <th style="width: 25%">Kode Mesin</th>
+        <th style="width: 25%">Mesin</th>
         <td>
-            <span class="badge bg-dark"><?= $row->kd_machine ?></span>
+            <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-dark"><?= $row->kode_mesin ?></button>
+                <a href="#" class="btn btn-dark"></span> <?= $row->nama_mesin ?></a>
+            </div>
         </td>
+        <!-- <td>
+            <span class="badge bg-dark"><?= $row->nama_mesin ?></span>
+        </td> -->
     </tr>
     <tr>
-        <th>Kode Produk</th>
-        <td><span class="badge bg-success"><?= $row->kd_product ?></span></td>
+        <th>Produk</th>
+        <td>
+        <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-dark"><?= $row->kd_product ?></button>
+                <a href="#" class="btn btn-success"></span> <?= $row->nama_produk ?></a>
+        </div>
+        </td>
     </tr>
     <tr>
         <th>Cavity</th>

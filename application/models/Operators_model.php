@@ -20,17 +20,18 @@ class Operators_model extends MY_Model
 
      public function get_dropdown()
 {
-    $result = $this->db->select('id, user_id, nama,jabatan, divisi')
+    $result = $this->db->select('id, user_id, nama, jabatan, divisi')
                        ->from('operators')
-                       ->order_by('id', 'DESC')
+                       ->like('jabatan', 'leader', 'both') // ✅ tampilkan semua yang mengandung "leader"
+                       ->order_by('nama', 'ASC')
                        ->get()
                        ->result();
 
-    $dropdown = ['' => '-- Pilih Operators --'];
+    $dropdown = ['' => '-- Pilih Leader / Ass.Leader --'];
     foreach ($result as $row) {
-        // tampilkan kode mesin + nama mesin
-        $dropdown[$row->id] = $row->id . ' - ' . $row->nama;
+        $dropdown[$row->id] = $row->nama . ' [' . $row->jabatan.']';
     }
     return $dropdown;
 }
+
 }

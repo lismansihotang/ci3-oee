@@ -35,6 +35,8 @@ class Inspector_qc extends MY_Controller
     public function edit($id, $view = '')
     {
         $this->setTitle('Ubah Data Inspector_qc');
+        $this->data['list_machines'] = $this->Machines_model->get_dropdown();
+        $this->data['list_operators'] = $this->Operators_model->get_dropdown();
         parent::form($id, 'inspector_qc/form');
     }
 

@@ -17,11 +17,10 @@ class Spk extends MY_Controller
     }
 
     public function index($view = '')
-    {
-        $this->setTitle('Spk');
-
-        parent::index('spk/index');
-    }
+{
+    $this->setTitle('Spk');
+    parent::index('spk/index');
+}
 
     public function create($id = null, $view = '')
     {
@@ -37,12 +36,15 @@ class Spk extends MY_Controller
     public function edit($id, $view = '')
     {
         $this->setTitle('Ubah Data Spk');
+        $this->data['list_po'] = $this->Purchase_orders_model->get_dropdown();
+        $this->data['list_machines'] = $this->Machines_model->get_dropdown();
         parent::form($id, 'spk/form');
     }
 
     public function view($id, $view = '', $data = [])
     {
         $this->setTitle('Detail Spk');
+        $this->data['list_machines'] = $this->Machines_model->get_dropdown();
         parent::view($id, 'spk/view', $data = []);
     }
 

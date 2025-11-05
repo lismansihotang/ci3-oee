@@ -136,7 +136,8 @@ if (!function_exists('generate_table_view')) {
                         // Pastikan penanganan link juga mendukung object/array jika $row adalah array
                         $link_property = $col['link_property'] ?? $property;
                         $link_value = is_object($row) ? ($row->$link_property ?? '') : ($row[$link_property] ?? '');
-                        $url = base_url(($col['url'] ?? '') . $link_value);
+                        // $url = base_url(($col['url'] ?? '') . $link_value);
+                        $url = site_url(($col['url'] ?? '') . $link_value);
                         $text = $col['link_text'] ?? $value;
                         $content_html  = '<a href="' . html_escape($url) . '" class="link-info link-underline link-underline-opacity-0">' . html_escape($text) . '</a>';
                         break;

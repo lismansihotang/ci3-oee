@@ -24,7 +24,7 @@
         <?php
 
             $headers = [
-                'Kode Produk','Jumlah', 'Harga', 'Subtotal',
+                'Kode Produk','','Jumlah', 'Harga', 'Subtotal',
                 //'Tanggal Kirim'
             ];
 $columns = [

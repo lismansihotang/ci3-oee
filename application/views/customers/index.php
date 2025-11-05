@@ -8,8 +8,8 @@
 <?= build_table([
     'headers' => array(
         //'id' => 'Id',
-        'kd_cust' => 'Kode',
-        'nm_cust' => 'Nama',
+        'kd_cust' => 'Kode Customers',
+        'nm_cust' => 'Nama Customers',
         //'alamat1' => 'Alamat1',
         //'alamat2' => 'Alamat2',
         'kota' => 'Kota',

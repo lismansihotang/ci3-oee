@@ -8,9 +8,9 @@
     <?= build_table([
         'headers' => array (
   'id' => 'ID',
-  'kode_mesin' => 'KODE',
-  'nama_mesin' => 'NAMA',
-  'jenis_mesin' => 'JENIS',
+  'kode_mesin' => 'Kode Mesin',
+  'nama_mesin' => 'Nama Mesin',
+  'jenis_mesin' => 'Jenis',
 //   'urutan' => 'URUTAN',
 //   'jenis' => 'Jenis',
 //   'manufacturer' => 'MANUFACTURER',

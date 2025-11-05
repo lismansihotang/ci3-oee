@@ -12,7 +12,8 @@ class Products extends MY_Controller
         $this->load->model('Products_model','model');
         $this->controller_name = 'products';
         $this->model->set_group_by([]);
-        $this->model->set_order_by();
+        $this->model->set_order_by('id', 'ASC');
+
     }
 
     public function index($view = '')
@@ -43,5 +44,29 @@ class Products extends MY_Controller
     public function delete($id)
     {
         parent::delete($id);
+    }
+    public function view_by_code($code, $view = '')
+    {
+        // var_dump($code);
+        // exit;
+        $this->setTitle('Detail Products');
+        parent::view_by_code($code, 'products/view');
+    }
+
+    public function get_product_data($product_code)
+    {
+        // Pastikan ini adalah AJAX request atau cek hak akses
+
+        $product = $this->model->get_by_code($product_code);
+
+        if ($product) {
+            $this->output
+                 ->set_content_type('application/json')
+                 ->set_output(json_encode(['success' => true, 'data' => $product]));
+        } else {
+            $this->output
+                 ->set_content_type('application/json')
+                 ->set_output(json_encode(['success' => false, 'message' => 'Product not found']));
+        }
     }
 }

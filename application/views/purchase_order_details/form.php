@@ -1,12 +1,32 @@
-<?= card_open(isset($row) ? '<i class="icon cil-window"></i> Edit Purchase_order_details' : '<i class="icon cil-window"></i> Tambah Purchase_order_details') ?>
-    <form method="post">
-        <?= bs_floating_input('id', 'text', (isset($row) ? $row->id : '')); ?><?= bs_floating_input('id_po', 'text', (isset($row) ? $row->id_po : '')); ?><?= bs_floating_input('no', 'text', (isset($row) ? $row->no : '')); ?><?= bs_floating_input('kd_product', 'text', (isset($row) ? $row->kd_product : '')); ?><?= bs_floating_input('nm_product', 'text', (isset($row) ? $row->nm_product : '')); ?><?= bs_floating_input('qty', 'text', (isset($row) ? $row->qty : '')); ?><?= bs_floating_input('harga', 'text', (isset($row) ? $row->harga : '')); ?><?= bs_floating_input('subtotal', 'text', (isset($row) ? $row->subtotal : '')); ?><?= bs_floating_input('total', 'text', (isset($row) ? $row->total : '')); ?><?= bs_floating_input('kiriman_akhir', 'text', (isset($row) ? $row->kiriman_akhir : '')); ?><?= bs_floating_input('qty_kirim', 'text', (isset($row) ? $row->qty_kirim : '')); ?><?= bs_floating_input('sisa_order', 'text', (isset($row) ? $row->sisa_order : '')); ?><?= bs_floating_input('status', 'text', (isset($row) ? $row->status : '')); ?><?= bs_floating_input('jml_kirim', 'text', (isset($row) ? $row->jml_kirim : '')); ?><?= bs_floating_input('jml_retur', 'text', (isset($row) ? $row->jml_retur : '')); ?><?= bs_floating_input('is_deleted', 'text', (isset($row) ? $row->is_deleted : '')); ?><?= bs_floating_input('created_by', 'text', (isset($row) ? $row->created_by : '')); ?><?= bs_floating_input('updated_by', 'text', (isset($row) ? $row->updated_by : '')); ?><?= bs_floating_input('deleted_by', 'text', (isset($row) ? $row->deleted_by : '')); ?><?= bs_floating_input('created_at', 'text', (isset($row) ? $row->created_at : '')); ?><?= bs_floating_input('updated_at', 'text', (isset($row) ? $row->updated_at : '')); ?><?= bs_floating_input('deleted_at', 'text', (isset($row) ? $row->deleted_at : '')); ?>
-        <div class="mt-3">
-            <div class="btn-group" role="group" aria-label="FormCreateUpdate">
-                <button type="submit" class="btn btn-success" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Simpan Data Sekarang"><i class="icon cil-save"></i> Simpan</button>
-                <a href="<?= site_url('purchase_order_details') ?>" class="btn btn-secondary" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke List Data"><i class="icon cil-reload"></i> Kembali</a>
-                <a href="<?= site_url('/') ?>" class="btn btn-outline-dark" data-coreui-toggle="tooltip" data-coreui-placement="top" title="< Kembali ke Halaman Utama"><i class="icon cil-home"></i></a>
-            </div>
+<?= card_open(isset($row) ? '<i class="icon cil-window"></i> Edit Purchase Order Details' : '<i class="icon cil-window"></i> Tambah Purchase Order Details') ?>
+
+<form method="post">
+    <?php
+    $fields = [
+        'id','id_po','no','kd_product','nm_product','qty','harga','subtotal','total',
+        'kiriman_akhir','qty_kirim','sisa_order','status','jml_kirim','jml_retur',
+        'is_deleted','created_by','updated_by','deleted_by','created_at','updated_at','deleted_at'
+    ];
+
+    foreach($fields as $field) {
+        $value = isset($row) ? $row->$field : '';
+        echo bs_floating_input($field, 'text', $value);
+    }
+    ?>
+
+    <div class="mt-3">
+        <div class="btn-group" role="group" aria-label="FormCreateUpdate">
+            <button type="submit" class="btn btn-success" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Simpan Data Sekarang">
+                <i class="icon cil-save"></i> Simpan
+            </button>
+            <a href="<?= site_url('purchase_order_details') ?>" class="btn btn-secondary" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Kembali ke List Data">
+                <i class="icon cil-reload"></i> Kembali
+            </a>
+            <a href="<?= site_url('/') ?>" class="btn btn-outline-dark" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Kembali ke Halaman Utama">
+                <i class="icon cil-home"></i>
+            </a>
         </div>
-    </form>
+    </div>
+</form>
+
 <?= card_close() ?>

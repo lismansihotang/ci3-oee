@@ -88,7 +88,7 @@ if (!function_exists('generate_accordion')) {
             }
             $html .= '  </h2>';
 
-            $html .= '  <div id="' . $collapse_id . '" class="accordion-collapse collapse' . $show_class . '" aria-labelledby="' . $heading_id . '" data-bs-parent="#' . html_escape($id) . '">';
+            $html .= '  <div id="' . $collapse_id . '" class="accordion-collapse collapse' . $show_class . '" aria-labelledby="' . $heading_id . '">';
             $html .= '      <div class="accordion-body ' . html_escape($body_class) . '">' . $content . '</div>';
             $html .= '  </div>';
             $html .= '</div>';

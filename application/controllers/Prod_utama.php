@@ -21,7 +21,8 @@ class Prod_utama extends MY_Controller
         $this->controller_name = 'prod_utama';
         $this->load->helper('shift');
         $this->load->helper('time');
-        $this->model->set_group_by([]);
+        $this->load->helper('calculation');
+        $this->model->set_group_by(['kode_produksi']);
         $this->load->helper('prod');
     }
 
@@ -81,25 +82,28 @@ class Prod_utama extends MY_Controller
         $this->form_with_details(null, 'prod_utama/form', $data);
     }
 
-    public function save()
+   public function save()
 {
     $post_data = $this->input->post();
 
-    // Begin transaction
+    // Tentukan shift
+    $shift = isset($post_data['sh']) ? $post_data['sh'] : '1';
+   $kode_produksi = str_replace("-", "", $post_data['tanggal']) . $post_data['kd_ms'] . $post_data['no_spk'];
+
+    // Mulai transaksi
     $this->db->trans_start();
 
-    $shift = isset($post_data['sh']) ? $post_data['sh'] : '1';
-
-    // === Cek apakah sudah ada data utama (per tanggal + mesin + spk) ===
     $existing = $this->db->get_where('prod_utama', [
-        'tanggal' => $post_data['tanggal'],
-        'kd_ms'   => $post_data['kd_ms'],
-        'no_spk'  => $post_data['no_spk'],
+        'tanggal'    => $post_data['tanggal'],
+        'kd_ms'      => $post_data['kd_ms'],
+        'no_spk'     => $post_data['no_spk'],
+        'sh'         => $shift,   
         'is_deleted' => 0
     ])->row();
 
     // --- Siapkan data utama ---
     $main_data = [
+        'kode_produksi' => $kode_produksi, 
         'tanggal'       => $post_data['tanggal'],
         'kd_prod'       => $post_data['kd_prod'],
         'kd_ms'         => $post_data['kd_ms'],
@@ -116,11 +120,11 @@ class Prod_utama extends MY_Controller
     }
 
     if ($existing) {
-        // === UPDATE + AKUMULASI ===
+        // === UPDATE + AKUMULASI per shift ===
         $main_data['jml_pass'] = $existing->jml_pass + (int)$post_data['jml_pass'];
         $main_data['jml_hold'] = $existing->jml_hold + (int)$post_data['jml_hold'];
 
-        // Rata-rata persen dari yang lama dan baru
+        // Rata-rata persen per shift
         $main_data['persen_pass']   = round(($existing->persen_pass + $post_data['persen_pass']) / 2, 2);
         $main_data['persen_reject'] = round(($existing->persen_reject + $post_data['persen_reject']) / 2, 2);
         $main_data['persen_down']   = round(($existing->persen_down + $post_data['persen_down']) / 2, 2);
@@ -128,14 +132,14 @@ class Prod_utama extends MY_Controller
         $this->db->where('id', $existing->id)->update('prod_utama', $main_data);
         $prod_id = $existing->id;
     } else {
-        // === INSERT BARU ===
+        // === INSERT BARU per shift ===
         $main_data['jml_pass'] = (int)$post_data['jml_pass'];
         $main_data['jml_hold'] = (int)$post_data['jml_hold'];
         $this->model->insert($main_data);
         $prod_id = $this->db->insert_id();
     }
 
-    // === PROD DETAIL ===
+    // === PROD DETAIL per shift ===
     $detail_ids = [];
     $jam_data = $post_data['jam'] ?? [];
     $id_data  = $post_data['id'] ?? [];
@@ -146,16 +150,15 @@ class Prod_utama extends MY_Controller
 
         $detail_data = [
             'prod_id'   => $prod_id,
+            'kode_produksi' => $kode_produksi, 
             'shift'     => $shift,
             'jam'       => $jam_data[$i],
             'pass_qty'  => ($post_data['pass_qty'][$i] !== '') ? $post_data['pass_qty'][$i] : 0,
             'hold_qty'  => ($post_data['hold_qty'][$i] !== '') ? $post_data['hold_qty'][$i] : 0,
         ];
 
-        // langsung insert tanpa hapus data shift sebelumnya
         $this->prod_detail_model->insert($detail_data);
         $detail_id = $this->db->insert_id();
-
         $detail_ids[$rowId] = $detail_id;
     }
 
@@ -174,6 +177,7 @@ class Prod_utama extends MY_Controller
                 $duration_min = $arr_time['total_minutes'];
                 $downtimes[] = [
                     'prod_id'      => $prod_id,
+                    'kode_produksi' => $kode_produksi, 
                     'shift'        => $shift,
                     'kd_ms'        => $post_data['kd_ms'],
                     'tanggal'      => $post_data['tanggal'],
@@ -192,15 +196,16 @@ class Prod_utama extends MY_Controller
         }
     }
 
+    // Commit transaksi
     $this->db->trans_complete();
 
     if ($this->db->trans_status() === FALSE) {
         $this->session->set_flashdata('error', 'Data gagal disimpan!');
     } else {
-        $this->session->set_flashdata('success', 'Data berhasil disimpan & diakumulasikan!');
+        $this->session->set_flashdata('success', 'Data berhasil disimpan & diakumulasikan per shift!');
     }
 
-    // redirect
+    // Redirect ke shift berikutnya atau view
     $int_shift = (int)$shift;
     $page_redirect = ($int_shift < 3)
         ? 'prod_utama/edit/' . $prod_id . '/' . min($int_shift + 1, 3)
@@ -208,6 +213,7 @@ class Prod_utama extends MY_Controller
 
     redirect($page_redirect);
 }
+
 
 
     private function get_detail_rejects($prod_details = [])
@@ -292,14 +298,19 @@ class Prod_utama extends MY_Controller
     }
 
     public function view($id, $view = '', $data = [])
-    {
-        $this->setTitle('Detail Prod_utama');
-        $data['prod_details'] = $this->prod_detail_model->get_data(['prod_id' => $id]);
-        $data['reject_details'] = $this->get_detail_rejects($data['prod_details']);
-        $data['prod_downtimes'] = $this->prod_downtime_model->get_data(['prod_id' => $id]);
-        $data['prod_id'] = $id;
-        parent::view($id, 'prod_utama/view', $data);
-    }
+{
+    $this->setTitle('Detail Prod_utama');
+
+    // ambil detail berdasarkan kode_produksi
+    $data['prod_details']    = $this->prod_detail_model->get_with_reject(['prod_detail.prod_id' => $id]);
+    $data['reject_details']  = $this->get_detail_rejects($data['prod_details']);
+    $data['prod_downtimes']  = $this->prod_downtime_model->get_data(['prod_downtime.prod_id' => $id]);
+    $data['prod_id']   = $id;
+
+    // jangan kirim $kode_produksi ke parent (karena parent view biasanya baca ID)
+    parent::view($id, 'prod_utama/view', $data);
+}
+
 
     public function delete($id)
     {

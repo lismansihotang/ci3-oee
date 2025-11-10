@@ -49,20 +49,52 @@
                     'type' => 'nav-title'
                 ],
                 [
-                    'label' => 'Purchase Orders',
-                    'url' => 'purchase_orders',
-                    'type' => 'link'
+                    'label' => 'PPIC',
+                    'type'  => 'collapse',
+                    'children' => [
+                        [
+                            'label' => 'Purchase Orders',
+                            'url' => 'purchase_orders',
+                            'type' => 'link'
+                        ],
+                        [
+                            'label' => 'SPK (Surat Perintah Kerja)',
+                            'url' => 'spk',
+                            'type' => 'link'
+                        ],
+                    ]
                 ],
-                [
-                    'label' => 'SPK (Surat Perintah Kerja)',
-                    'url' => 'spk',
-                    'type' => 'link'
-                ],
-                [
+                // [
+                //     'label' => 'Purchase Orders',
+                //     'url' => 'purchase_orders',
+                //     'type' => 'link'
+                // ],
+                // [
+                //     'label' => 'SPK (Surat Perintah Kerja)',
+                //     'url' => 'spk',
+                //     'type' => 'link'
+                // ],
+                 [
                     'label' => 'Production',
-                    'url' => 'prod_utama',
-                    'type' => 'link'
+                    'type'  => 'collapse',
+                    'children' => [
+                        [
+                            'label' => 'Input Hasil Produksi',
+                            'url'   => 'prod_utama',
+                            'type'  => 'link'
+                        ],
+                        [
+                            'label' => 'Laporan Hasil Produksi',
+                            'url'   => 'inspector_qc',
+                            'type'  => 'link'
+                        ],
+                    ]
                 ],
+                // [
+                //     'label' => 'Production',
+                //     'url' => 'prod_utama',
+                //     'type' => 'link'
+                // ],
                 [
                     'label' => 'Quality Control',
                     'type'  => 'collapse',

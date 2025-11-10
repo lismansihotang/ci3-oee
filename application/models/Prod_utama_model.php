@@ -35,7 +35,7 @@ class Prod_utama_model extends MY_Model
         machines.kode_mesin,
         operators.nama,
         spk.no_spk,
-        spk.tday
+        spk.tday AS tday
     ';
 
     protected $searchable_columns = [
@@ -44,7 +44,8 @@ class Prod_utama_model extends MY_Model
         'machines.nama_mesin',
         'machines.kode_mesin',
         'operators.nama',
-        'spk.no_spk'
+        'spk.no_spk',
+        'spk.tday'
     ];
 
     

@@ -34,6 +34,13 @@ function get_spk_callback($row, $value)
     ];
     return generate_btn_group($buttons);
 }
+function get_target_callback($row, $value)
+{
+    $buttons = [
+        ['label' => get_single_value('Spk_model', ['id' => $row->no_spk], 'tday'), 'class' => 'btn btn-outline-info', 'href' => site_url(['spk/view', 'id' => $value])],
+    ];
+    return generate_btn_group($buttons);
+}
 function get_operator_callback($row, $value)
 {
     $buttons = [
@@ -49,8 +56,11 @@ $prod_utama_header_maps = [
     'Kode Produk'          => 'kd_prod',
     'Kode Mesin'           => ['property' => 'kd_ms', 'type' => 'callback', 'callback' => 'get_mesin_callback'],
     'No. SPK'              => ['property' => 'no_spk', 'type' => 'callback', 'callback' => 'get_spk_callback'],
-    'Operator'              => ['property' => 'operators_id', 'type' => 'callback', 'callback' => 'get_operator_callback'],
+    'Target / Day'         => ['property' => 'tday', 'type' => 'callback', 'callback' => 'get_target_callback'],  // ✅ kolom baru
+    'Operator'             => ['property' => 'operators_id', 'type' => 'callback', 'callback' => 'get_operator_callback'],
 ];
+//var_dump($prod_utama_header_maps);
+
 $prod_utama_table_attributes = [
     'class' => 'table table-bordered table-hover border w-100'
 ];
@@ -64,7 +74,7 @@ $prod_detail_headers = [
     'jam' => ['label' => 'Jam', 'property' => 'jam', 'align' => 'center'],
     'shift' => ['label' => 'Shift', 'property' => 'shift', 'align' => 'center'],
     'pass_qty' => ['label' => 'Pass', 'property' => 'pass_qty', 'align' => 'center'],
-    'hold_qty' => ['label' => 'Hold', 'property' => 'hold_qty', 'align' => 'center'],
+    'reject_qty' => ['label' => 'Reject', 'property' => 'reject_qty', 'align' => 'center'],
 ];
 
 $prod_downtime_headers = [
@@ -76,75 +86,164 @@ $prod_downtime_headers = [
     'action' => ['label' => 'Aksi', 'property' => 'action',],
 ];
 
-$accod_items = [
-    [
+
+
+// Group per shift
+$shift1 = group_array($prod_details, 'shift', 1);
+$shift1 = isset($shift1[1]) ? $shift1[1] : [];
+
+$shift2 = group_array($prod_details, 'shift', 2);
+$shift2 = isset($shift2[2]) ? $shift2[2] : [];
+
+$shift3 = group_array($prod_details, 'shift', 3);
+$shift3 = isset($shift3[3]) ? $shift3[3] : [];
+
+// Bangun kembali accod items
+// $accod_items = [
+//     [
+//         'title' => 'Details [SHIFT 1]',
+//         'content' =>
+//             generate_table_view($shift1, $prod_detail_headers, $table_attributes)
+//             . "<div class='p-2 bg-light border-top fw-bold text-end'>
+//                  TOTAL PASS : " . number_format(calculate_total($shift1, 'pass_qty'), 0) . "
+//                  &nbsp;&nbsp;|&nbsp;&nbsp;
+//                  TOTAL REJECT : " . number_format(calculate_total($shift1, 'reject_qty'), 0) . "
+//                </div>",
+//         'icon' => 'cil-chart',
+//         'body_class' => 'p-0',
+//         'actions' => [
+//             [
+//                 'type' => 'dropdown',
+//                 'icon' => '<i class="icon cil-options"></i>',
+//                 'class' => 'btn btn-outline-dark m-2',
+//                 'items' => [
+//                     [
+//                         'label' => 'Edit Detail [SHIFT 1]',
+//                         'url'   => ['prod_utama/edit', 'id' => $prod_id, 'shift' => '1'],
+//                         'icon'  => 'cil-pencil'
+//                     ],
+//                 ]
+//             ]
+//         ]
+//     ],
+//     [
+//         'title' => 'Details [SHIFT 2]',
+//         'content' =>
+//             generate_table_view($shift2, $prod_detail_headers, $table_attributes)
+//             . "<div class='p-2 bg-light border-top fw-bold text-end'>
+//                  TOTAL PASS : " . number_format(calculate_total($shift2, 'pass_qty'), 0) . "
+//                  &nbsp;&nbsp;|&nbsp;&nbsp;
+//                  TOTAL REJECT : " . number_format(calculate_total($shift2, 'reject_qty'), 0) . "
+//                </div>",
+//         'icon' => 'cil-chart',
+//         'body_class' => 'p-0',
+//         'actions' => [
+//             [
+//                 'type' => 'dropdown',
+//                 'icon' => '<i class="icon cil-options"></i>',
+//                 'class' => 'btn btn-outline-dark m-2',
+//                 'items' => [
+//                     [
+//                         'label' => 'Edit Detail [SHIFT 2]',
+//                         'url'   => ['prod_utama/edit', 'id' => $prod_id, 'shift' => '2'],
+//                         'icon'  => 'cil-pencil'
+//                     ],
+//                 ]
+//             ]
+//         ]
+//     ],
+//     [
+//         'title' => 'Details [SHIFT 3]',
+//         'content' =>
+//             generate_table_view($shift3, $prod_detail_headers, $table_attributes)
+//             . "<div class='p-2 bg-light border-top fw-bold text-end'>
+//                  TOTAL PASS : " . number_format(calculate_total($shift3, 'pass_qty'), 0) . "
+//                  &nbsp;&nbsp;|&nbsp;&nbsp;
+//                  TOTAL REJECT : " . number_format(calculate_total($shift3, 'reject_qty'), 0) . "
+//                </div>",
+//         'icon' => 'cil-chart',
+//         'body_class' => 'p-0',
+//         'actions' => [
+//             [
+//                 'type' => 'dropdown',
+//                 'icon' => '<i class="icon cil-options"></i>',
+//                 'class' => 'btn btn-outline-dark m-2',
+//                 'items' => [
+//                     [
+//                         'label' => 'Edit Detail [SHIFT 3]',
+//                         'url'   => ['prod_utama/edit', 'id' => $prod_id, 'shift' => '3'],
+//                         'icon'  => 'cil-pencil'
+//                     ],
+//                 ]
+//             ]
+//         ]
+//     ],
+//     [
+//         'title' => 'Downtimes',
+//         'content' => generate_table_view($prod_downtimes, $prod_downtime_headers, $table_attributes),
+//         'icon' => 'cil-clock',
+//         'body_class' => 'p-0',
+//     ]
+// ];
+$accod_items = [];
+
+// SHIFT 1
+if (!empty($shift1)) {
+    $accod_items[] = [
         'title' => 'Details [SHIFT 1]',
-        'content' => generate_table_view(group_array($prod_details, 'shift', 1), $prod_detail_headers, $table_attributes),
+        'content' =>
+            generate_table_view($shift1, $prod_detail_headers, $table_attributes)
+            . "<div class='p-2 bg-light border-top fw-bold text-end'>
+                 TOTAL PASS : " . number_format(calculate_total($shift1, 'pass_qty'), 0) . "
+                 &nbsp;&nbsp;|&nbsp;&nbsp;
+                 TOTAL REJECT : " . number_format(calculate_total($shift1, 'reject_qty'), 0) . "
+               </div>",
         'icon' => 'cil-chart',
         'body_class' => 'p-0',
-        'actions' => [
-            [
-                'type' => 'dropdown',
-                'icon' => '<i class="icon cil-options"></i>',
-                'class' => 'btn btn-outline-dark m-2',
-                'items' => [
-                    [
-                        'label' => 'Edit Detail [SHIFT 1]',
-                        'url'   => ['prod_utama/edit', 'id' => $prod_id, 'shift' => '1'],
-                        'icon'  => 'cil-pencil'
-                    ],
-                ]
-            ]
-        ]
-    ],
-    [
+    ];
+}
+
+// SHIFT 2
+if (!empty($shift2)) {
+    $accod_items[] = [
         'title' => 'Details [SHIFT 2]',
-        'content' => generate_table_view(group_array($prod_details, 'shift', 2), $prod_detail_headers, $table_attributes),
+        'content' =>
+            generate_table_view($shift2, $prod_detail_headers, $table_attributes)
+            . "<div class='p-2 bg-light border-top fw-bold text-end'>
+                 TOTAL PASS : " . number_format(calculate_total($shift2, 'pass_qty'), 0) . "
+                 &nbsp;&nbsp;|&nbsp;&nbsp;
+                 TOTAL REJECT : " . number_format(calculate_total($shift2, 'reject_qty'), 0) . "
+               </div>",
         'icon' => 'cil-chart',
         'body_class' => 'p-0',
-        'actions' => [
-            [
-                'type' => 'dropdown',
-                'icon' => '<i class="icon cil-options"></i>', // Ganti ikon dropdown
-                'class' => 'btn btn-outline-dark m-2', // Kelas untuk tombol utama dropdown
-                'items' => [
-                    [
-                        'label' => 'Edit Detail [SHIFT 2]',
-                        'url'   => ['prod_utama/edit', 'id' => $prod_id, 'shift' => '2'],
-                        'icon'  => 'cil-pencil'
-                    ],
-                ]
-            ]
-        ]
-    ],
-    [
+    ];
+}
+
+// SHIFT 3
+if (!empty($shift3)) {
+    $accod_items[] = [
         'title' => 'Details [SHIFT 3]',
-        'content' => generate_table_view(group_array($prod_details, 'shift', 3), $prod_detail_headers, $table_attributes),
+        'content' =>
+            generate_table_view($shift3, $prod_detail_headers, $table_attributes)
+            . "<div class='p-2 bg-light border-top fw-bold text-end'>
+                 TOTAL PASS : " . number_format(calculate_total($shift3, 'pass_qty'), 0) . "
+                 &nbsp;&nbsp;|&nbsp;&nbsp;
+                 TOTAL REJECT : " . number_format(calculate_total($shift3, 'reject_qty'), 0) . "
+               </div>",
         'icon' => 'cil-chart',
         'body_class' => 'p-0',
-        'actions' => [
-            [
-                'type' => 'dropdown',
-                'icon' => '<i class="icon cil-options"></i>', // Ganti ikon dropdown
-                'class' => 'btn btn-outline-dark m-2', // Kelas untuk tombol utama dropdown
-                'items' => [
-                    [
-                        'label' => 'Edit Detail [SHIFT 3]',
-                        'url'   => ['prod_utama/edit', 'id' => $prod_id, 'shift' => '3'],
-                        'icon'  => 'cil-pencil'
-                    ],
-                ]
-            ]
-        ]
-    ],
-    [
-        'title' => 'Downtimes',
-        'content' => generate_table_view($prod_downtimes, $prod_downtime_headers, $table_attributes),
-        'icon' => 'cil-clock',
-        'body_class' => 'p-0',
-    ]
+    ];
+}
+
+// DOWNTIME selalu ditampilkan
+$accod_items[] = [
+    'title' => 'Downtimes',
+    'content' => generate_table_view($prod_downtimes, $prod_downtime_headers, $table_attributes),
+    'icon' => 'cil-clock',
+    'body_class' => 'p-0',
 ];
 echo generate_accordion($accod_items, 'accord_details', TRUE, 0);
+
 ?>
 <div class="row mt-3">
     <div class="col-12">Informasi Data</div>

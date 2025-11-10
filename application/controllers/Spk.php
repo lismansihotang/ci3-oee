@@ -43,10 +43,24 @@ class Spk extends MY_Controller
 
     public function view($id, $view = '', $data = [])
     {
-        $this->setTitle('Detail Spk');
+        $this->setTitle('Detail SPK');
+
+        // Ambil data SPK lengkap dengan join
+        $row = $this->model->get_by_id($id);
+
+        if (!$row) {
+            show_404();
+            return;
+        }
+
+        // Siapkan data untuk view
+        $this->data['row'] = $row;
         $this->data['list_machines'] = $this->Machines_model->get_dropdown();
-        parent::view($id, 'spk/view', $data = []);
+
+        // Render manual tanpa panggil parent::view()
+        $this->render('spk/view', $this->data);
     }
+
 
     public function delete($id)
     {

@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * @property Products_model $model
@@ -9,17 +9,16 @@ class Products extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Products_model','model');
+        $this->load->model('Products_model', 'model');
         $this->controller_name = 'products';
         $this->model->set_group_by([]);
-        $this->model->set_order_by('id', 'ASC');
-
+        $this->model->set_order_by('id');
     }
 
     public function index($view = '')
     {
         $this->setTitle('Products');
-        
+
         parent::index('products/index');
     }
 
@@ -45,28 +44,10 @@ class Products extends MY_Controller
     {
         parent::delete($id);
     }
+
     public function view_by_code($code, $view = '')
     {
-        // var_dump($code);
-        // exit;
         $this->setTitle('Detail Products');
         parent::view_by_code($code, 'products/view');
-    }
-
-    public function get_product_data($product_code)
-    {
-        // Pastikan ini adalah AJAX request atau cek hak akses
-
-        $product = $this->model->get_by_code($product_code);
-
-        if ($product) {
-            $this->output
-                 ->set_content_type('application/json')
-                 ->set_output(json_encode(['success' => true, 'data' => $product]));
-        } else {
-            $this->output
-                 ->set_content_type('application/json')
-                 ->set_output(json_encode(['success' => false, 'message' => 'Product not found']));
-        }
     }
 }

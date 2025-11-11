@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Products_model extends MY_Model
 {
@@ -9,43 +9,43 @@ class Products_model extends MY_Model
     protected $searchable_columns = [];
 
     public function get_defects_with_standard($kd_produk)
-{
-    $product = $this->db->where('kd_produk', $kd_produk)->get('products')->row_array();
-    if (!$product) return [];
+    {
+        $product = $this->db->where('kd_produk', $kd_produk)->get('products')->row_array();
+        if (!$product) return [];
 
-    $defects = [];
-    foreach ($product as $field => $value) {
-        if (strpos($field, 'qc_') === 0) {
-            $label = str_replace('qc_', '', $field);
-            $label = ucwords(str_replace('_', ' ', $label)); // rapikan label
+        $defects = [];
+        foreach ($product as $field => $value) {
+            if (strpos($field, 'qc_') === 0) {
+                $label = str_replace('qc_', '', $field);
+                $label = ucwords(str_replace('_', ' ', $label)); // rapikan label
 
-            $defects[] = [
-                'field'    => $field,
-                'label'    => $label,
-                'standard' => $value
-            ];
+                $defects[] = [
+                    'field'    => $field,
+                    'label'    => $label,
+                    'standard' => $value
+                ];
+            }
         }
+        return $defects;
     }
-    return $defects;
-}
 
 
-public function get_dropdown()
-{
-    $result = $this->db->select('id, nama_produk, kd_produk')
-                       ->from('products')
-                       ->order_by('id', 'DESC')
-                       ->get()
-                       ->result();
+    public function get_dropdown()
+    {
+        $result = $this->db->select('id, nama_produk, kd_produk')
+            ->from('products')
+            ->order_by('id', 'DESC')
+            ->get()
+            ->result();
 
-    $dropdown = ['' => '-- Pilih Products --'];
-    foreach ($result as $row) {
-        $dropdown[$row->id] = $row->id . ' - ' . $row->nama_produk. ' - ' .$row->kd_produk;
+        $dropdown = ['' => '-- Pilih Products --'];
+        foreach ($result as $row) {
+            $dropdown[$row->id] = $row->id . ' - ' . $row->nama_produk . ' - ' . $row->kd_produk;
+        }
+        return $dropdown;
     }
-    return $dropdown;
-}
 
-  public function get_all_for_select()
+    public function get_all_for_select()
     {
         return $this->db->select('id, nama_produk, kd_produk')
             ->from($this->table)
@@ -53,7 +53,8 @@ public function get_dropdown()
             ->get()
             ->result();
     }
-public function get_by_code($product_code)
+
+    public function get_by_code($product_code)
     {
         $this->db->where('kd_produk', $product_code);
         $query = $this->db->get($this->table);
